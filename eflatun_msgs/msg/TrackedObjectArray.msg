@@ -1,4 +1,4 @@
-# TrackedObject.msg
+# TrackedObjectArray.msg
 
 std_msgs/Header header
 
