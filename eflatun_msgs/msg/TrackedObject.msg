@@ -4,6 +4,7 @@ std_msgs/Header header
 
 uint32 unique_id
 uint32 age
+uint32 missing_age
 
 uint32 center_x
 uint32 center_y
