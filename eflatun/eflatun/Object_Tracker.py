@@ -53,10 +53,12 @@ class ObjectTracker:
         else:
             for obj in detected_object_msgs:
                 new_object = Object(obj)
-                closest_object_id, distance = self.distance_calculator.find_closest_object(new_object, self.objects.values())
+                closest_object_id, distance = self.distance_calculator.find_closest_object(
+                    new_object, self.objects.values())
 
                 if self.objects[closest_object_id] is not None and distance < 50:
-                    self.objects[closest_object_id].update(new_object.center_x, new_object.center_y, new_object.width, new_object.height)
+                    self.objects[closest_object_id].update(new_object.center_x, new_object.center_y, new_object.width,
+                                                           new_object.height)
                 else:
                     new_object.unique_id = self.next_unique_id
                     self.objects[self.next_unique_id] = new_object
@@ -71,8 +73,12 @@ class ObjectTracker:
                     if obj.missing_age > self.max_missing_frames:
                         del self.objects[obj.unique_id]
 
-        tracked_objects = [obj.to_ros_message() if obj.missing_age == 0 else obj.from_prediction_to_ros_message() for obj in self.objects.values()]
+        tracked_objects = [
+            obj.to_ros_message() if obj.missing_age == 0 else obj.from_prediction_to_ros_message()
+            for obj in self.objects.values()
+        ]
         return tracked_objects
+
 
 class DistanceCalculator:
 
@@ -99,9 +105,10 @@ class DistanceCalculator:
         min_distance = distances[0, min_distance_index]
 
         return closest_object_id, min_distance
-    
+
     def __repr__(self) -> str:
         return f"DistanceCalculator(metric='euclidean')"
+
 
 class ObjectTrackingNode(Node):
 
