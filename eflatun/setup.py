@@ -25,6 +25,7 @@ setup(
         'console_scripts': [
     'object_tracker = eflatun.Object_Tracker:main',
     'object_detector = eflatun.Object_Detector:main',
+    'object = eflatun.Object:main'
     ],
     },
 )

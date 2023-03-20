@@ -11,30 +11,18 @@ from datetime import datetime
 today = datetime.now().strftime("%d_%m_%Y")
 
 if True:
-    VIDEO_DEVICE = "file:///home/iha/Desktop/eflatun_ros/fake_video.mp4"
-    VIDEO_SAVE_FILE = f"fake/FAKE_{1}_Eflatun_IHA_{today}.mp4"
-
-    NAMESPACE = "fake_camera"
-    NODENAME = "all_detections"
-    DETECTION_PUBLISHERNAME = "fake_detections"
-
-    VIDEO_WIDTH = 1920
-    VIDEO_HEIGHT = 1080
-
-    CAMERA_ARGS = [f"--input-width={VIDEO_WIDTH}", f"--input-height={VIDEO_HEIGHT}"]
+    VIDEO_DEVICE = "file:///home/iha/Desktop/eflatun_ws/videos/sample_detection_video_v1.mp4"
+    VIDEO_SAVE_FILE = f"/home/iha/Desktop/eflatun_ws/videos/output_videos/test_video_Eflatun_IHA_{today}.mp4"
 
 else:
     VIDEO_DEVICE = "v4l2:///dev/video0"
     VIDEO_SAVE_FILE = f"{args.round}_Eflatun_IHA_{today}.mp4"
 
-    NAMESPACE = "camera"
-    NODENAME = "all_detections"
-    DETECTION_PUBLISHERNAME = "detections"
 
-    VIDEO_WIDTH = 1920
-    VIDEO_HEIGHT = 1080
+VIDEO_WIDTH = 1920
+VIDEO_HEIGHT = 1080
 
-    CAMERA_ARGS = [f"--input-width={VIDEO_WIDTH}", f"--input-height={VIDEO_HEIGHT}"]
+CAMERA_ARGS = [f"--input-width={VIDEO_WIDTH}", f"--input-height={VIDEO_HEIGHT}"]
 
 COLOR_RED = (255, 0, 0, 255)
 COLOR_GREEN = (20, 255, 50, 255)
@@ -46,17 +34,17 @@ MARGIN_HEIGHT = VIDEO_HEIGHT // 10
 DETECTION_GAP = VIDEO_WIDTH * 2 // 20
 
 RTP_IP = "rtp://192.168.1.2:1234"
-DETECTION_MODEL_PATH = os.path.abspath(args.model)
-LABELS_PATH = "/home/iha/Desktop/eflatun_ros/model/labels.txt"
+DETECTION_MODEL_PATH = "/home/iha/Desktop/eflatun_ws/models/yolov8n_iha_v3.onnx"
+LABELS_PATH = "/home/iha/Desktop/eflatun_ws/models/labels.txt"
 
 BITRATE_STREAM = 1  #MBPS
-BITRATE_VIDEO = 1  #MBPS
+BITRATE_VIDEO = 50  #MBPS
 
 
 class JetsonDetector(Node):
 
     def __init__(self):
-        super().__init__(NODENAME, namespace=NAMESPACE)
+        super().__init__("webcam_handler")
 
         self.get_logger().info("Initializing...")
 
@@ -79,7 +67,7 @@ class JetsonDetector(Node):
 
         self.detections_publisher = self.create_publisher(TrackedObjectArray, "/webcam/detections", 1)
 
-        self.create_subscription(TrackedObjectArray, "/tracker/detections_tracked", self.stream_frame, 1)
+        self.create_subscription(TrackedObjectArray, "/webcam/detections", self.stream_frame, 1)
 
         self.font = jetson.utils.cudaFont(size=32)
 
@@ -108,16 +96,16 @@ class JetsonDetector(Node):
         for single_detection in self.detections:
             tracked_detection = TrackedObject()
             tracked_detection.header = detections_msg.header
-            tracked_detection.center_x = int(single_detection.Center[0] + DETECTION_GAP)
-            tracked_detection.center_y = int(single_detection.Center[1])
-            tracked_detection.width = int(single_detection.Width)
-            tracked_detection.height = int(single_detection.Height)
+            tracked_detection.center_x = single_detection.Center[0] + DETECTION_GAP
+            tracked_detection.center_y = single_detection.Center[1]
+            tracked_detection.width = single_detection.Width
+            tracked_detection.height = single_detection.Height
 
             detections_msg.detections.append(tracked_detection)
 
         self.detections_publisher.publish(detections_msg)
 
-    def stream_frame(self, msg):
+    def stream_frame(self, msg: TrackedObjectArray):
 
         # TODO Since this is a callback, there is delay but frame is current frame. So Bbox comes late. Fix it.
 
@@ -130,14 +118,14 @@ class JetsonDetector(Node):
         jetson.utils.cudaDrawLine(self.full_frame, (MARGIN_WIDTH, VIDEO_HEIGHT - MARGIN_HEIGHT),
                                   (VIDEO_WIDTH - MARGIN_WIDTH, VIDEO_HEIGHT - MARGIN_HEIGHT), COLOR_GREEN, THICK)
 
-        for tracktion in msg.detections:
+        for tracked_detection in msg.detections:
 
-            x1 = tracktion.bbox.center.x - tracktion.bbox.size_x / 2
-            x2 = tracktion.bbox.center.x + tracktion.bbox.size_x / 2
-            y1 = tracktion.bbox.center.y - tracktion.bbox.size_y / 2
-            y2 = tracktion.bbox.center.y + tracktion.bbox.size_y / 2
+            x1 = tracked_detection.center_x - tracked_detection.width / 2
+            x2 = tracked_detection.center_x + tracked_detection.width / 2
+            y1 = tracked_detection.center_y - tracked_detection.height / 2
+            y2 = tracked_detection.center_y + tracked_detection.height / 2
 
-            object_id = "id: " + tracktion.results[0].id
+            object_id = f"id: {tracked_detection.unique_id}"
 
             self.font.OverlayText(self.full_frame, self.full_frame.width, self.full_frame.height, object_id, int(x1),
                                   int(y2), (255, 0, 0), (0, 0, 0))

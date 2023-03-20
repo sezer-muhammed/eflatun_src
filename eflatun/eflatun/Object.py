@@ -23,7 +23,6 @@
     uint32 height
 """
 
-from builtin_interfaces.msg import Time
 from filterpy.kalman import KalmanFilter
 from eflatun_msgs.msg import TrackedObject
 import numpy as np
@@ -34,6 +33,7 @@ from scipy.optimize import minimize
 class Object:
 
     def __init__(self, msg: TrackedObject, dt: float = 1/30, kf_params: dict=None) -> None:
+
         self.unique_id = msg.unique_id
         self.age = msg.age
         self.missing_age = msg.missing_age
@@ -44,6 +44,8 @@ class Object:
 
         self.predicted_x = self.center_x
         self.predicted_y = self.center_y
+        self.predicted_width = self.width
+        self.predicted_height = self.height
 
 
         self.kf = KalmanFilter(dim_x=4, dim_z=2)
@@ -60,8 +62,8 @@ class Object:
                                 [0, 0, 0, 1]])
             self.kf.H = np.array([[1, 0, 0, 0],
                                 [0, 1, 0, 0]])
-            self.kf.P = np.diag([100, 100, 10, 10])
-            self.kf.R = np.diag([50, 50])
+            self.kf.P = np.diag([60, 60, 10, 10])
+            self.kf.R = np.diag([20, 20])
             self.kf.Q = np.diag([0.1, 0.1, 0.01, 0.01])
 
     def update(self, center_x: int, center_y: int, width: int, height: int) -> None:
@@ -73,19 +75,19 @@ class Object:
 
 
         # Predict next state using Kalman filter
-        self.kf.predict()
+        self.predict()
         self.kf.update(np.array([center_x, center_y]))
 
     def predict(self) -> None:
         # Predict next position using Kalman filter
-        predicted_state = self.kf.predict()
+        self.predicted_state = self.kf.predict()
         self.age += 1
-        self.predicted_x, self.predicted_y = predicted_state[:2]
+        self.predicted_x, self.predicted_y = self.kf.x[0], self.kf.x[1]
         self.predicted_width, self.predicted_height = self.width, self.height  # Assuming fixed plane size
 
     def to_ros_message(self) -> TrackedObject:
         msg = TrackedObject()
-        msg.header.stamp = Time.from_msg(self.get_clock().now().to_msg())
+
         msg.unique_id = self.unique_id
         msg.age = self.age
         msg.center_x = self.center_x
@@ -95,10 +97,8 @@ class Object:
         return msg
     
     def from_prediction_to_ros_message(self) -> TrackedObject:
-        
         self.center_x, self.center_y = self.predicted_x, self.predicted_y
         msg = TrackedObject()
-        msg.header.stamp = Time.from_msg(self.get_clock().now().to_msg())
         msg.unique_id = self.unique_id
         msg.age = self.age
         msg.center_x = self.predicted_x
@@ -109,10 +109,10 @@ class Object:
         return msg
     
     def __repr__(self):
-        return f"Object(id={self.unique_id}, age={self.age}, x={self.center_x}|{self.predicted_x}, y={self.center_y}|{self.predicted_y}, w={self.width}, h={self.height})"
+        return f"\nObject(\n    id={self.unique_id}, age={self.age}, missing age={self.missing_age}\n    x={self.center_x} <|> {self.predicted_x},\n    y={self.center_y} <|> {self.predicted_y},\n    w={self.width}, h={self.height}\n)"
 
     def __str__(self):
-        return f"Object {self.unique_id}"
+        return self.__repr__()
 
     def __eq__(self, other):
         return self.unique_id == other.unique_id
@@ -160,3 +160,10 @@ class KalmanParameterOptimizer: #TODO use this code find parameters and save the
     def optimize(self) -> Tuple[List[float], float]:
         result = minimize(self.cost_function, self.initial_guess, method='Powell')
         return result.x, result.fun
+    
+def main(args=None):
+    pass
+
+
+if __name__ == '__main__':
+    main()
