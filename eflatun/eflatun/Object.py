@@ -108,6 +108,12 @@ class Object:
         
         return msg
     
+    def has_desired_size(self, min_width: int, min_height: int) -> bool:
+        return self.width >= min_width and self.height >= min_height
+
+    def is_within_range(self, x_range: Tuple[int, int], y_range: Tuple[int, int]) -> bool:
+        return (x_range[0] <= self.center_x <= x_range[1]) and (y_range[0] <= self.center_y <= y_range[1])
+
     def __repr__(self):
         return f"\nObject(\n    id={self.unique_id}, age={self.age}, missing age={self.missing_age}\n    x={self.center_x} <|> {self.predicted_x},\n    y={self.center_y} <|> {self.predicted_y},\n    w={self.width}, h={self.height}\n)"
 

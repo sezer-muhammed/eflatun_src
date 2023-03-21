@@ -26,6 +26,7 @@ setup(
     'object_tracker = eflatun.Object_Tracker:main',
     'object_detector = eflatun.Object_Detector:main',
     'object = eflatun.Object:main'
+    'best_object_selector = eflatun.Best_Object_Selector:main'
     ],
     },
 )
