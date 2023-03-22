@@ -28,6 +28,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from rclpy.parameter import Parameter
 from rcl_interfaces.msg import SetParametersResult
+from rclpy.logging import LoggingSeverity
 
 from typing import List, Tuple, Dict
 import numpy as np
@@ -129,16 +130,29 @@ class ObjectTrackingNode(Node):
 
         self.declare_parameters(namespace='',
                                 parameters=[
+                                    ('log_level', Parameter.Type.STRING),
                                     ('max_missing_frames', Parameter.Type.INTEGER),
                                     ('distance_threshold', Parameter.Type.INTEGER),
                                     ('min_age_to_predict', Parameter.Type.INTEGER)
                                 ])
 
         self.params = {
+            'log_level': self.get_parameter('log_level').value,
             'max_missing_frames': self.get_parameter('max_missing_frames').value,
             'distance_threshold': self.get_parameter('distance_threshold').value,
             'min_age_to_predict': self.get_parameter('min_age_to_predict').value
         }
+
+        log_level_mapping = {
+            'debug': LoggingSeverity.DEBUG,
+            'info': LoggingSeverity.INFO,
+            'warn': LoggingSeverity.WARN,
+            'error': LoggingSeverity.ERROR,
+            'fatal': LoggingSeverity.FATAL,
+        }
+        log_level = log_level_mapping.get(self.params["log_level"], LoggingSeverity.INFO)
+        self.get_logger().set_level(log_level)
+
         self.get_logger().info(json.dumps(self.params, sort_keys=True, indent=4))
 
         qos_profile = QoSProfile(depth=2)

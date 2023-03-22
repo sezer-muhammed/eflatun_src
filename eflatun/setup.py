@@ -25,6 +25,7 @@ setup(
             'object_detector = eflatun.Object_Detector:main',
             'object = eflatun.Object:main',
             'best_object_selector = eflatun.Best_Object_Selector:main',
+            'vehicle_status_gui = eflatun.Vehicle_Status_Gui:main',
         ],
     },
 )

@@ -1,5 +1,6 @@
 object_tracker:
   ros__parameters:
-    max_missing_frames: 40
-    distance_threshold: 1000
-    min_age_to_predict: 1
+    log_level: "info"
+    max_missing_frames: 30
+    distance_threshold: 200
+    min_age_to_predict: 5

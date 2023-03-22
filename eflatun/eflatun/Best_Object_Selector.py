@@ -1,12 +1,14 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.parameter import Parameter
+from rclpy.logging import LoggingSeverity
+from rcl_interfaces.msg import SetParametersResult
 
 import json
 
 from eflatun_msgs.msg import TrackedObjectArray, TrackedObject
 from typing import Tuple
-from eflatun import Object
+from eflatun.Object import Object
 
 
 class BestObjectSelector(Node):
@@ -16,6 +18,7 @@ class BestObjectSelector(Node):
 
         self.declare_parameters(namespace='',
                                 parameters=[
+                                    ('log_level', Parameter.Type.STRING),
                                     ('frame_center.x', Parameter.Type.INTEGER),
                                     ('frame_center.y', Parameter.Type.INTEGER),
                                     ('x_range.min', Parameter.Type.INTEGER),
@@ -31,6 +34,7 @@ class BestObjectSelector(Node):
                                 ])
 
         self.params = {
+            'log_level': self.get_parameter('log_level').value,
             'frame_center': {
                 'x': self.get_parameter('frame_center.x').value,
                 'y': self.get_parameter('frame_center.y').value
@@ -52,6 +56,17 @@ class BestObjectSelector(Node):
                 'dist_to_center_weight': self.get_parameter('score_variables.dist_to_center_weight').value
             }
         }
+
+        log_level_mapping = {
+            'debug': LoggingSeverity.DEBUG,
+            'info': LoggingSeverity.INFO,
+            'warn': LoggingSeverity.WARN,
+            'error': LoggingSeverity.ERROR,
+            'fatal': LoggingSeverity.FATAL,
+        }
+        log_level = log_level_mapping.get(self.params["log_level"], LoggingSeverity.INFO)
+        self.get_logger().set_level(log_level)
+
         self.get_logger().info(json.dumps(self.params, sort_keys=True, indent=4))
 
         self.subscription = self.create_subscription(
@@ -82,26 +97,48 @@ class BestObjectSelector(Node):
             tracked_object = Object(tracked_object_msg)
 
             if not tracked_object.has_desired_size(self.params["min_width"], self.params["min_height"]):
+                self.get_logger().debug(f"Object {tracked_object.unique_id} skipped due to size")
                 continue
 
             if not tracked_object.is_within_range((self.params["x_range"]["min"], self.params["x_range"]["max"]), (self.params["y_range"]["min"], self.params["y_range"]["max"])):
+                self.get_logger().debug(f"Object {tracked_object.unique_id} skipped due to range")
                 continue
 
             score = self.calculate_score(tracked_object)
+            self.get_logger().debug(f"Object {tracked_object.unique_id} score: {score}")
 
             if score > best_score:
                 best_score = score
                 best_object = tracked_object
 
-            if tracked_object.age == 120:
-                self.get_logger().info(f"Object {tracked_object.unique_id} has reached age 120")
+            if 120 < tracked_object.age:
+                self.get_logger().info(f"Object {tracked_object.unique_id} has reached age 120 with {tracked_object.age}")
 
         if best_object:
             best_object_msg = best_object.to_ros_message()
             self.publisher.publish(best_object_msg)
         else:
+            self.get_logger().debug("No best object found")
             pass
 
+    def on_parameter_change(self, params):
+        # Update the parameter dictionary with the new values
+        for param in params:
+            try:
+                param_name = param.name
+                param_value = param.value
+
+                param_name = param_name.split(".")
+                params_temp = self.params
+                for key in param_name[:-1]:
+                    params_temp = params_temp[key]
+                params_temp[param_name[-1]] = param_value
+                self.get_logger().info('Parameter {} updated to {}'.format(param_name, param_value))
+            except:
+                self.get_logger().warning('Parameter {} cannot updated to {}'.format(param_name, param_value))
+                return SetParametersResult(successful=False)
+            
+        return SetParametersResult(successful=True)
 
 def main(args=None) -> None:
     rclpy.init(args=args)
