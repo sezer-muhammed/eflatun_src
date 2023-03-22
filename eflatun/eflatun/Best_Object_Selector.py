@@ -10,6 +10,7 @@ class BestObjectSelector(Node):
     def __init__(self):
         super().__init__('best_object_selector')
 
+        self.get_logger().info("Initializing BestObjectSelector")
         # Configuration values
         self.frame_center = (1920 / 2, 1080 / 2)
         self.x_range = (1920 / 4, 3 * 1920 / 4)
@@ -61,11 +62,10 @@ class BestObjectSelector(Node):
                 self.get_logger().info(f"Object {tracked_object.unique_id} has reached age 120")
 
         if best_object:
-            self.get_logger().info(f"Best object: {best_object}")
             best_object_msg = best_object.to_ros_message()
             self.publisher.publish(best_object_msg)
         else:
-            self.get_logger().info("No object meets the criteria")
+            pass
 
 
 def main(args=None) -> None:

@@ -3,67 +3,115 @@ import jetson.utils
 
 import rclpy
 from rclpy.node import Node
+from rclpy.parameter import Parameter
+from rcl_interfaces.msg import SetParametersResult
 from eflatun_msgs.msg import TrackedObject, TrackedObjectArray
 
 import os
 from datetime import datetime
 
 today = datetime.now().strftime("%d_%m_%Y")
-
-if True:
-    VIDEO_DEVICE = "file:///home/iha/Desktop/eflatun_ws/videos/sample_detection_video_v1.mp4"
-    VIDEO_SAVE_FILE = f"/home/iha/Desktop/eflatun_ws/videos/output_videos/test_video_Eflatun_IHA_{today}.mp4"
-
-else:
-    VIDEO_DEVICE = "v4l2:///dev/video0"
-    VIDEO_SAVE_FILE = f"{args.round}_Eflatun_IHA_{today}.mp4"
-
-
-VIDEO_WIDTH = 1920
-VIDEO_HEIGHT = 1080
-
-CAMERA_ARGS = [f"--input-width={VIDEO_WIDTH}", f"--input-height={VIDEO_HEIGHT}"]
-
-COLOR_RED = (255, 0, 0, 255)
-COLOR_GREEN = (20, 255, 50, 255)
-THICK = 2
-
-MARGIN_WIDTH = VIDEO_WIDTH // 4
-MARGIN_HEIGHT = VIDEO_HEIGHT // 10
-
-DETECTION_GAP = VIDEO_WIDTH * 2 // 20
-
-RTP_IP = "rtp://192.168.1.2:1234"
-DETECTION_MODEL_PATH = "/home/iha/Desktop/eflatun_ws/models/yolov8n_iha_v3.onnx"
-LABELS_PATH = "/home/iha/Desktop/eflatun_ws/models/labels.txt"
-
-BITRATE_STREAM = 1  #MBPS
-BITRATE_VIDEO = 50  #MBPS
+import time
 
 
 class JetsonDetector(Node):
 
     def __init__(self):
-        super().__init__("webcam_handler")
+        super().__init__("object_detector")
 
-        self.get_logger().info("Initializing...")
+        # Generate the 'today' string
+        today = datetime.now().strftime("%d_%m_%Y")  #TODO add this into save file name
+
+        self.get_logger().info("Initializing JetsonDetector")
+
+        self.declare_parameters(namespace='',
+                                parameters=[
+                                    ('use_device', Parameter.Type.STRING),
+                                    ('video.device', Parameter.Type.STRING),
+                                    ('video.save_path', Parameter.Type.STRING),
+                                    ('video.round', Parameter.Type.INTEGER),
+                                    ('cam.device', Parameter.Type.STRING),
+                                    ('cam.save_path', Parameter.Type.STRING),
+                                    ('cam.round', Parameter.Type.INTEGER),
+                                    ('video_width', Parameter.Type.INTEGER),
+                                    ('video_height', Parameter.Type.INTEGER),
+                                    ('camera_args', Parameter.Type.STRING_ARRAY),
+                                    ('visualization.colors.red', Parameter.Type.INTEGER_ARRAY),
+                                    ('visualization.colors.green', Parameter.Type.INTEGER_ARRAY),
+                                    ('visualization.colors.aqua', Parameter.Type.INTEGER_ARRAY),
+                                    ('visualization.thick', Parameter.Type.INTEGER),
+                                    ('visualization.font_size', Parameter.Type.INTEGER),
+                                    ('visualization.margin.width_ratio', Parameter.Type.DOUBLE),
+                                    ('visualization.margin.height_ratio', Parameter.Type.DOUBLE),
+                                    ('model.detection_path', Parameter.Type.STRING),
+                                    ('model.labels_path', Parameter.Type.STRING),
+                                    ('model.detection_gap_ratio', Parameter.Type.DOUBLE),
+                                    ('rtp_ip', Parameter.Type.STRING),
+                                    ('bitrate.stream', Parameter.Type.INTEGER),
+                                    ('bitrate.video', Parameter.Type.INTEGER),
+                                ])
+
+        self.params = {
+            'use_device': self.get_parameter('use_device').value,
+            'video': {
+                'device': self.get_parameter('video.device').value,
+                'save_path': self.get_parameter('video.save_path').value,
+                'round': self.get_parameter('video.round').value
+            },
+            'cam': {
+                'device': self.get_parameter('cam.device').value,
+                'save_path': self.get_parameter('cam.save_path').value,
+                'round': self.get_parameter('cam.round').value
+            },
+            'video_width': self.get_parameter('video_width').value,
+            'video_height': self.get_parameter('video_height').value,
+            'camera_args': self.get_parameter('camera_args').value,
+            'visualization': {
+                'colors': {
+                    'red': self.get_parameter('visualization.colors.red').value,
+                    'green': self.get_parameter('visualization.colors.green').value,
+                    'aqua': self.get_parameter('visualization.colors.aqua').value
+                },
+                'thick': self.get_parameter('visualization.thick').value,
+                'font_size': self.get_parameter('visualization.font_size').value,
+                'margin': {
+                    'width_ratio': self.get_parameter('visualization.margin.width_ratio').value,
+                    'height_ratio': self.get_parameter('visualization.margin.height_ratio').value
+                }
+            },
+            'model': {
+                'detection_path': self.get_parameter('model.detection_path').value,
+                'labels_path': self.get_parameter('model.labels_path').value,
+                'detection_gap_ratio': self.get_parameter('model.detection_gap_ratio').value
+            },
+            'rtp_ip': self.get_parameter('rtp_ip').value,
+            'bitrate': {
+                'stream': self.get_parameter('bitrate.stream').value,
+                'video': self.get_parameter('bitrate.video').value
+            }
+        }
+
+        # Subscribe to parameter changes
+        self.add_on_set_parameters_callback(self.on_parameter_change)
 
         self.frame_counter = 0
 
         self.plane_detection_model = jetson.inference.detectNet(
             threshold=0.4,  # TODO test if its correct or hardcoded to 0.5
             argv=[
-                '--model=' + DETECTION_MODEL_PATH, '--labels=' + LABELS_PATH, '--input-blob=images',
-                '--output-cvg=scores', '--output-bbox=bboxes'
+                '--model=' + self.params["model"]["detection_path"], '--labels=' + self.params["model"]["labels_path"],
+                '--input-blob=images', '--output-cvg=scores', '--output-bbox=bboxes'
             ])
 
-        self.logitech_webcam = jetson.utils.videoSource(VIDEO_DEVICE, argv=CAMERA_ARGS)
+        self.logitech_webcam = jetson.utils.videoSource(self.params["use_device"]["device"],
+                                                        argv=self.params["camera_args"])
 
         self.rtp_stream_output = jetson.utils.videoOutput(
-            RTP_IP, argv=["--headless", f"--bitrate={BITRATE_STREAM * 1024 * 1024}"])
+            self.params["rtp_ip"], argv=["--headless", f"--bitrate={self.params['bitrate']['stream'] * 1024 * 1024}"])
 
         self.video_file_output = jetson.utils.videoOutput(
-            VIDEO_SAVE_FILE, argv=["--headless", f"--bitrate={BITRATE_VIDEO * 1024 * 1024}"])
+            self.params["use_device"]["save_path"],
+            argv=["--headless", f"--bitrate={self.params['bitrate']['video'] * 1024 * 1024}"])
 
         self.detections_publisher = self.create_publisher(TrackedObjectArray, "/webcam/detections", 1)
 
@@ -72,14 +120,20 @@ class JetsonDetector(Node):
         self.font = jetson.utils.cudaFont(size=32)
 
         self.create_timer(1 / 30, self.detect_objects)
-        self.crop_roi = (DETECTION_GAP, 0, VIDEO_WIDTH - DETECTION_GAP, VIDEO_HEIGHT)
-        self.get_logger().info("Detection and stream node has been created")
+        self.crop_roi = (int(self.params["model"]["detection_gap_ratio"] * self.params["video_width"]), 0,
+                         self.params["video_width"] -
+                         int(self.params["model"]["detection_gap_ratio"] * self.params["video_width"]),
+                         self.params["video_height"])
+        self.get_logger().info('Detection frame area: ({}, {}) - ({}, {})'.format(self.crop_roi[0], self.crop_roi[1],
+                                                                                  self.crop_roi[2], self.crop_roi[3]))
 
     def get_frame(self):
         self.full_frame = self.logitech_webcam.Capture()
-        self.detection_frame = jetson.utils.cudaAllocMapped(width=VIDEO_WIDTH - 2 * DETECTION_GAP,
-                                                            height=VIDEO_HEIGHT,
-                                                            format=self.full_frame.format)
+        self.detection_frame = jetson.utils.cudaAllocMapped(
+            width=self.params["video_width"] -
+            2 * int(self.params["model"]["detection_gap_ratio"] * self.params["video_width"]),
+            height=self.params["video_height"],
+            format=self.full_frame.format)
         jetson.utils.cudaCrop(self.full_frame, self.detection_frame, self.crop_roi)
 
     def detect_objects(self):
@@ -96,7 +150,8 @@ class JetsonDetector(Node):
         for single_detection in self.detections:
             tracked_detection = TrackedObject()
             tracked_detection.header = detections_msg.header
-            tracked_detection.center_x = single_detection.Center[0] + DETECTION_GAP
+            tracked_detection.center_x = single_detection.Center[0] + int(
+                self.params["model"]["detection_gap_ratio"] * self.params["video_width"])
             tracked_detection.center_y = single_detection.Center[1]
             tracked_detection.width = single_detection.Width
             tracked_detection.height = single_detection.Height
@@ -109,14 +164,31 @@ class JetsonDetector(Node):
 
         # TODO Since this is a callback, there is delay but frame is current frame. So Bbox comes late. Fix it.
 
-        jetson.utils.cudaDrawLine(self.full_frame, (MARGIN_WIDTH, MARGIN_HEIGHT),
-                                  (MARGIN_WIDTH, VIDEO_HEIGHT - MARGIN_HEIGHT), COLOR_GREEN, THICK)
-        jetson.utils.cudaDrawLine(self.full_frame, (MARGIN_WIDTH, MARGIN_HEIGHT),
-                                  (VIDEO_WIDTH - MARGIN_WIDTH, MARGIN_HEIGHT), COLOR_GREEN, THICK)
-        jetson.utils.cudaDrawLine(self.full_frame, (VIDEO_WIDTH - MARGIN_WIDTH, MARGIN_HEIGHT),
-                                  (VIDEO_WIDTH - MARGIN_WIDTH, VIDEO_HEIGHT - MARGIN_HEIGHT), COLOR_GREEN, THICK)
-        jetson.utils.cudaDrawLine(self.full_frame, (MARGIN_WIDTH, VIDEO_HEIGHT - MARGIN_HEIGHT),
-                                  (VIDEO_WIDTH - MARGIN_WIDTH, VIDEO_HEIGHT - MARGIN_HEIGHT), COLOR_GREEN, THICK)
+        jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                                int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
+                                        (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                        int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
+                                        self.params["visualization"]["colors"]["green"], 
+                                        int(self.params["visualization"]["thick"]))
+        jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                                int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
+                                        (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                        int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
+                                        self.params["visualization"]["colors"]["green"], 
+                                        int(self.params["visualization"]["thick"]))
+        jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                                int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
+                                        (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                        int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
+                                        self.params["visualization"]["colors"]["green"], 
+                                        int(self.params["visualization"]["thick"]))
+        jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                                int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
+                                        (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                        int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
+                                        self.params["visualization"]["colors"]["green"], 
+                                        int(self.params["visualization"]["thick"]))
+
 
         for tracked_detection in msg.detections:
 
@@ -130,15 +202,17 @@ class JetsonDetector(Node):
             self.font.OverlayText(self.full_frame, self.full_frame.width, self.full_frame.height, object_id, int(x1),
                                   int(y2), (255, 0, 0), (0, 0, 0))
 
-            jetson.utils.cudaDrawLine(self.full_frame, (x1, y1), (x2, y1), COLOR_RED, THICK)
-            jetson.utils.cudaDrawLine(self.full_frame, (x1, y1), (x1, y2), COLOR_RED, THICK)
-            jetson.utils.cudaDrawLine(self.full_frame, (x1, y2), (x2, y2), COLOR_RED, THICK)
-            jetson.utils.cudaDrawLine(self.full_frame, (x2, y1), (x2, y2), COLOR_RED, THICK)
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y1)), (int(x2), int(y1)), self.params["visualization"]["colors"]["red"], int(self.params["visualization"]["thick"]))
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y1)), (int(x1), int(y2)), self.params["visualization"]["colors"]["red"], int(self.params["visualization"]["thick"]))
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y2)), (int(x2), int(y2)), self.params["visualization"]["colors"]["red"], int(self.params["visualization"]["thick"]))
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x2), int(y1)), (int(x2), int(y2)), self.params["visualization"]["colors"]["red"], int(self.params["visualization"]["thick"]))
+
 
         on_image_log = [
             f"{datetime.now()}",
-            f"{DETECTION_MODEL_PATH.split('/')[-1]} @{round(self.plane_detection_model.GetNetworkFPS(), 2)} FPS"
+            f"{self.params['model']['detection_path'].split('/')[-1]} @{round(self.plane_detection_model.GetNetworkFPS(), 2)} FPS"
         ]
+
 
         self.print_logs_on_image(on_image_log)
 
@@ -151,13 +225,32 @@ class JetsonDetector(Node):
             self.font.OverlayText(self.full_frame, self.full_frame.width, self.full_frame.height, log, 10, 32 * i + 10,
                                   (255, 0, 0), (0, 90, 0, 100))
 
+    def on_parameter_change(self, params):
+        # Update the parameter dictionary with the new values
+        for param in params:
+            try:
+                param_name = param.name
+                param_value = param.value
+
+                param_name = param_name.split(".")
+                params_temp = self.params
+                for key in param_name[:-1]:
+                    params_temp = params_temp[key]
+                params_temp[param_name[-1]] = param_value
+                self.get_logger().info('Parameter {} updated to {}'.format(param_name, param_value))
+            except:
+                self.get_logger().warning('Parameter {} cannot updated to {}'.format(param_name, param_value))
+                return SetParametersResult(successful=False)
+        return SetParametersResult(successful=True)
+
 
 def main(args=None):
     rclpy.init(args=args)
     node = JetsonDetector()
     rclpy.spin(node)
+    node.destroy_node()
     rclpy.shutdown()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

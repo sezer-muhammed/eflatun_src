@@ -1,0 +1,34 @@
+object_detector:
+  ros__parameters:
+    use_device: "video"  # Choose between "video" and "cam"
+    video:
+      device: "file:///home/iha/Desktop/eflatun_ws/videos/sample_detection_video_v1.mp4"
+      save_path: "/home/iha/Desktop/eflatun_ws/videos/output_videos/test_video_Eflatun_IHA_{today}.mp4"
+      round: 1
+    cam:
+      device: "v4l2:///dev/video0"
+      save_path: "{round}_Eflatun_IHA_{today}.mp4"
+      round: 1
+    video_width: 1920
+    video_height: 1080
+    camera_args:
+      - "--input-width={VIDEO_WIDTH}"
+      - "--input-height={VIDEO_HEIGHT}"
+    visualization:
+      colors:
+        red: [255, 0, 0, 255]
+        green: [20, 255, 50, 255]
+        aqua: [0, 255, 255, 255]
+      thick: 2
+      font_size: 32
+      margin:
+        width_ratio: 0.25
+        height_ratio: 0.1
+    model:
+      detection_path: "/home/iha/Desktop/eflatun_ws/models/yolov8n_iha_v3.onnx"
+      labels_path: "/home/iha/Desktop/eflatun_ws/models/labels.txt"
+      detection_gap_ratio: 0.1
+    rtp_ip: "rtp://192.168.1.2:1234"
+    bitrate:
+      stream: 15  # MBPS
+      video: 50  # MBPS
