@@ -3,17 +3,18 @@ object_detector:
     use_device: "video"  # Choose between "video" and "cam"
     video:
       device: "file:///home/iha/Desktop/eflatun_ws/videos/sample_detection_video_v1.mp4"
-      save_path: "/home/iha/Desktop/eflatun_ws/videos/output_videos/test_video_Eflatun_IHA_{today}.mp4"
+      save_path: "/home/iha/Desktop/eflatun_ws/videos/output_videos/test_video_Eflatun_IHA_TODO.mp4"
       round: 1
     cam:
       device: "v4l2:///dev/video0"
-      save_path: "{round}_Eflatun_IHA_{today}.mp4"
+      save_path: "TODO_Eflatun_IHA_TODO.mp4"
       round: 1
     video_width: 1920
     video_height: 1080
     camera_args:
-      - "--input-width={VIDEO_WIDTH}"
-      - "--input-height={VIDEO_HEIGHT}"
+      - "--input-width=1920"
+      - "--input-height=1080"
+      - "--log-level=warning"
     visualization:
       colors:
         red: [255, 0, 0, 255]
@@ -24,6 +25,7 @@ object_detector:
       margin:
         width_ratio: 0.25
         height_ratio: 0.1
+      topic: "/webcam/detections"
     model:
       detection_path: "/home/iha/Desktop/eflatun_ws/models/yolov8n_iha_v3.onnx"
       labels_path: "/home/iha/Desktop/eflatun_ws/models/labels.txt"

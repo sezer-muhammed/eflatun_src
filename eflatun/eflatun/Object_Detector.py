@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 
 today = datetime.now().strftime("%d_%m_%Y")
-import time
+import json
 
 
 class JetsonDetector(Node):
@@ -43,6 +43,7 @@ class JetsonDetector(Node):
                                     ('visualization.font_size', Parameter.Type.INTEGER),
                                     ('visualization.margin.width_ratio', Parameter.Type.DOUBLE),
                                     ('visualization.margin.height_ratio', Parameter.Type.DOUBLE),
+                                    ('visualization.topic', Parameter.Type.STRING),
                                     ('model.detection_path', Parameter.Type.STRING),
                                     ('model.labels_path', Parameter.Type.STRING),
                                     ('model.detection_gap_ratio', Parameter.Type.DOUBLE),
@@ -77,7 +78,8 @@ class JetsonDetector(Node):
                 'margin': {
                     'width_ratio': self.get_parameter('visualization.margin.width_ratio').value,
                     'height_ratio': self.get_parameter('visualization.margin.height_ratio').value
-                }
+                },
+                'topic': self.get_parameter('visualization.topic').value
             },
             'model': {
                 'detection_path': self.get_parameter('model.detection_path').value,
@@ -91,31 +93,33 @@ class JetsonDetector(Node):
             }
         }
 
+        self.get_logger().info(json.dumps(self.params, sort_keys=True, indent=4))
+
         # Subscribe to parameter changes
         self.add_on_set_parameters_callback(self.on_parameter_change)
 
         self.frame_counter = 0
 
         self.plane_detection_model = jetson.inference.detectNet(
-            threshold=0.4,  # TODO test if its correct or hardcoded to 0.5
+            threshold=0.04,  # TODO test if its correct or hardcoded to 0.5
             argv=[
                 '--model=' + self.params["model"]["detection_path"], '--labels=' + self.params["model"]["labels_path"],
-                '--input-blob=images', '--output-cvg=scores', '--output-bbox=bboxes'
+                '--input-blob=images', '--output-cvg=scores', '--output-bbox=bboxes', '--log-level=warning'
             ])
 
-        self.logitech_webcam = jetson.utils.videoSource(self.params["use_device"]["device"],
+        self.logitech_webcam = jetson.utils.videoSource(self.params[self.params["use_device"]]["device"],
                                                         argv=self.params["camera_args"])
 
         self.rtp_stream_output = jetson.utils.videoOutput(
-            self.params["rtp_ip"], argv=["--headless", f"--bitrate={self.params['bitrate']['stream'] * 1024 * 1024}"])
+            self.params["rtp_ip"], argv=["--headless", f"--bitrate={self.params['bitrate']['stream'] * 1024 * 1024}", "--log-level=silent"])
 
         self.video_file_output = jetson.utils.videoOutput(
-            self.params["use_device"]["save_path"],
-            argv=["--headless", f"--bitrate={self.params['bitrate']['video'] * 1024 * 1024}"])
+            self.params[self.params["use_device"]]["save_path"],
+            argv=["--headless", f"--bitrate={self.params['bitrate']['video'] * 1024 * 1024}", "--log-level=silent"])
 
         self.detections_publisher = self.create_publisher(TrackedObjectArray, "/webcam/detections", 1)
 
-        self.create_subscription(TrackedObjectArray, "/webcam/detections", self.stream_frame, 1)
+        self.create_subscription(TrackedObjectArray, self.params["visualization"]["topic"], self.stream_frame, 1)
 
         self.font = jetson.utils.cudaFont(size=32)
 
@@ -168,25 +172,25 @@ class JetsonDetector(Node):
                                                 int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
                                         (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                         int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
-                                        self.params["visualization"]["colors"]["green"], 
+                                        tuple(self.params["visualization"]["colors"]["green"]), 
                                         int(self.params["visualization"]["thick"]))
         jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                                 int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
                                         (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                         int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
-                                        self.params["visualization"]["colors"]["green"], 
+                                        tuple(self.params["visualization"]["colors"]["green"]), 
                                         int(self.params["visualization"]["thick"]))
         jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                                 int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
                                         (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                         int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
-                                        self.params["visualization"]["colors"]["green"], 
+                                        tuple(self.params["visualization"]["colors"]["green"]), 
                                         int(self.params["visualization"]["thick"]))
         jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                                 int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
                                         (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                         int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
-                                        self.params["visualization"]["colors"]["green"], 
+                                        tuple(self.params["visualization"]["colors"]["green"]), 
                                         int(self.params["visualization"]["thick"]))
 
 
@@ -202,10 +206,10 @@ class JetsonDetector(Node):
             self.font.OverlayText(self.full_frame, self.full_frame.width, self.full_frame.height, object_id, int(x1),
                                   int(y2), (255, 0, 0), (0, 0, 0))
 
-            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y1)), (int(x2), int(y1)), self.params["visualization"]["colors"]["red"], int(self.params["visualization"]["thick"]))
-            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y1)), (int(x1), int(y2)), self.params["visualization"]["colors"]["red"], int(self.params["visualization"]["thick"]))
-            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y2)), (int(x2), int(y2)), self.params["visualization"]["colors"]["red"], int(self.params["visualization"]["thick"]))
-            jetson.utils.cudaDrawLine(self.full_frame, (int(x2), int(y1)), (int(x2), int(y2)), self.params["visualization"]["colors"]["red"], int(self.params["visualization"]["thick"]))
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y1)), (int(x2), int(y1)), tuple(self.params["visualization"]["colors"]["red"]), int(self.params["visualization"]["thick"]))
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y1)), (int(x1), int(y2)), tuple(self.params["visualization"]["colors"]["red"]), int(self.params["visualization"]["thick"]))
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y2)), (int(x2), int(y2)), tuple(self.params["visualization"]["colors"]["red"]), int(self.params["visualization"]["thick"]))
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x2), int(y1)), (int(x2), int(y2)), tuple(self.params["visualization"]["colors"]["red"]), int(self.params["visualization"]["thick"]))
 
 
         on_image_log = [

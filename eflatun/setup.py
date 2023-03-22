@@ -25,7 +25,6 @@ setup(
             'object_detector = eflatun.Object_Detector:main',
             'object = eflatun.Object:main',
             'best_object_selector = eflatun.Best_Object_Selector:main',
-            'param_test = eflatun.param_test:main'
         ],
     },
 )
