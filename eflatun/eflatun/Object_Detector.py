@@ -124,14 +124,15 @@ class JetsonDetector(Node):
         self.font = jetson.utils.cudaFont(size=32)
 
         self.create_timer(1 / 30, self.detect_objects)
-        self.crop_roi = (int(self.params["model"]["detection_gap_ratio"] * self.params["video_width"]), 0,
-                         self.params["video_width"] -
-                         int(self.params["model"]["detection_gap_ratio"] * self.params["video_width"]),
-                         self.params["video_height"])
+
         self.get_logger().info('Detection frame area: ({}, {}) - ({}, {})'.format(self.crop_roi[0], self.crop_roi[1],
                                                                                   self.crop_roi[2], self.crop_roi[3]))
 
     def get_frame(self):
+        self.crop_roi = (int(self.params["model"]["detection_gap_ratio"] * self.params["video_width"]), 0,
+                         self.params["video_width"] -
+                         int(self.params["model"]["detection_gap_ratio"] * self.params["video_width"]),
+                         self.params["video_height"])
         self.full_frame = self.logitech_webcam.Capture()
         self.detection_frame = jetson.utils.cudaAllocMapped(
             width=self.params["video_width"] -

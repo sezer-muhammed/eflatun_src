@@ -14,7 +14,7 @@ object_detector:
     camera_args:
       - "--input-width=1920"
       - "--input-height=1080"
-      - "--log-level=warning"
+      - "--log-level=silent"
     visualization:
       colors:
         red: [255, 0, 0, 255]
@@ -30,6 +30,7 @@ object_detector:
       detection_path: "/home/iha/Desktop/eflatun_ws/models/yolov8n_iha_v3.onnx"
       labels_path: "/home/iha/Desktop/eflatun_ws/models/labels.txt"
       detection_gap_ratio: 0.1
+      confidence: 0.3 #! implement this
     rtp_ip: "rtp://192.168.1.2:1234"
     bitrate:
       stream: 15  # MBPS
