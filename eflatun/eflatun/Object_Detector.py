@@ -36,8 +36,8 @@ class JetsonDetector(Node):
                                     ('video_width', Parameter.Type.INTEGER),
                                     ('video_height', Parameter.Type.INTEGER),
                                     ('camera_args', Parameter.Type.STRING_ARRAY),
-                                    ('visualization.colors.red', Parameter.Type.INTEGER_ARRAY),
-                                    ('visualization.colors.green', Parameter.Type.INTEGER_ARRAY),
+                                    ('visualization.colors.object', Parameter.Type.INTEGER_ARRAY),
+                                    ('visualization.colors.target_area', Parameter.Type.INTEGER_ARRAY),
                                     ('visualization.colors.aqua', Parameter.Type.INTEGER_ARRAY),
                                     ('visualization.thick', Parameter.Type.INTEGER),
                                     ('visualization.font_size', Parameter.Type.INTEGER),
@@ -69,8 +69,8 @@ class JetsonDetector(Node):
             'camera_args': self.get_parameter('camera_args').value,
             'visualization': {
                 'colors': {
-                    'red': self.get_parameter('visualization.colors.red').value,
-                    'green': self.get_parameter('visualization.colors.green').value,
+                    "object": self.get_parameter('visualization.colors.object').value,
+                    "target_area": self.get_parameter('visualization.colors.target_area').value,
                     'aqua': self.get_parameter('visualization.colors.aqua').value
                 },
                 'thick': self.get_parameter('visualization.thick').value,
@@ -124,7 +124,10 @@ class JetsonDetector(Node):
         self.font = jetson.utils.cudaFont(size=32)
 
         self.create_timer(1 / 30, self.detect_objects)
-
+        self.crop_roi = (int(self.params["model"]["detection_gap_ratio"] * self.params["video_width"]), 0,
+                         self.params["video_width"] -
+                         int(self.params["model"]["detection_gap_ratio"] * self.params["video_width"]),
+                         self.params["video_height"])
         self.get_logger().info('Detection frame area: ({}, {}) - ({}, {})'.format(self.crop_roi[0], self.crop_roi[1],
                                                                                   self.crop_roi[2], self.crop_roi[3]))
 
@@ -173,25 +176,25 @@ class JetsonDetector(Node):
                                                 int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
                                         (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                         int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
-                                        tuple(self.params["visualization"]["colors"]["green"]), 
+                                        tuple(self.params["visualization"]["colors"]["target_area"]), 
                                         int(self.params["visualization"]["thick"]))
         jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                                 int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
                                         (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                         int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
-                                        tuple(self.params["visualization"]["colors"]["green"]), 
+                                        tuple(self.params["visualization"]["colors"]["target_area"]), 
                                         int(self.params["visualization"]["thick"]))
         jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                                 int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
                                         (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                         int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
-                                        tuple(self.params["visualization"]["colors"]["green"]), 
+                                        tuple(self.params["visualization"]["colors"]["target_area"]), 
                                         int(self.params["visualization"]["thick"]))
         jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                                 int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
                                         (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                         int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
-                                        tuple(self.params["visualization"]["colors"]["green"]), 
+                                        tuple(self.params["visualization"]["colors"]["target_area"]), 
                                         int(self.params["visualization"]["thick"]))
 
 
@@ -207,10 +210,10 @@ class JetsonDetector(Node):
             self.font.OverlayText(self.full_frame, self.full_frame.width, self.full_frame.height, object_id, int(x1),
                                   int(y2), (255, 0, 0), (0, 0, 0))
 
-            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y1)), (int(x2), int(y1)), tuple(self.params["visualization"]["colors"]["red"]), int(self.params["visualization"]["thick"]))
-            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y1)), (int(x1), int(y2)), tuple(self.params["visualization"]["colors"]["red"]), int(self.params["visualization"]["thick"]))
-            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y2)), (int(x2), int(y2)), tuple(self.params["visualization"]["colors"]["red"]), int(self.params["visualization"]["thick"]))
-            jetson.utils.cudaDrawLine(self.full_frame, (int(x2), int(y1)), (int(x2), int(y2)), tuple(self.params["visualization"]["colors"]["red"]), int(self.params["visualization"]["thick"]))
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y1)), (int(x2), int(y1)), tuple(self.params["visualization"]["colors"]["object"]), int(self.params["visualization"]["thick"]))
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y1)), (int(x1), int(y2)), tuple(self.params["visualization"]["colors"]["object"]), int(self.params["visualization"]["thick"]))
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x1), int(y2)), (int(x2), int(y2)), tuple(self.params["visualization"]["colors"]["object"]), int(self.params["visualization"]["thick"]))
+            jetson.utils.cudaDrawLine(self.full_frame, (int(x2), int(y1)), (int(x2), int(y2)), tuple(self.params["visualization"]["colors"]["object"]), int(self.params["visualization"]["thick"]))
 
 
         on_image_log = [

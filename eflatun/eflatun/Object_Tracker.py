@@ -26,24 +26,30 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
+from rclpy.parameter import Parameter
+from rcl_interfaces.msg import SetParametersResult
+
 from typing import List, Tuple, Dict
 import numpy as np
 from scipy.spatial.distance import cdist
 from eflatun_msgs.msg import TrackedObject, TrackedObjectArray
 from eflatun.Object import Object
+import json
 
 
 class ObjectTracker:
 
-    def __init__(self, max_missing_frames: int = 4) -> None:
+    def __init__(self) -> None:
         self.objects: Dict[int, Object] = {}
         self.next_unique_id = 1
-        self.max_missing_frames = max_missing_frames
+        self.params = {}
         self.distance_calculator = DistanceCalculator()
+
+    def parameter_update(self, params):
+        self.params = params
 
     def track_objects(self, detected_object_msgs: List[TrackedObject]) -> List[TrackedObject]:
         if not self.objects:
-            print("Self Objects Boş, Her Gelen Ekleniyor.")
             for obj in detected_object_msgs:
                 new_object = Object(obj)
                 new_object.unique_id = self.next_unique_id
@@ -57,7 +63,7 @@ class ObjectTracker:
                 closest_object_id, distance = self.distance_calculator.find_closest_object(
                     new_object, self.objects.values())
 
-                if self.objects[closest_object_id] is not None and distance < 100:
+                if self.objects[closest_object_id] is not None and distance < self.params["distance_threshold"]:
                     self.objects[closest_object_id].update(new_object.center_x, new_object.center_y, new_object.width,
                                                            new_object.height)
                 else:
@@ -68,10 +74,10 @@ class ObjectTracker:
             # Predict the location of missing objects and increase their missing age
 
             for obj in self.objects.copy().values():
-                if obj.missing_age >= 1 and obj.age > 8:
+                if obj.missing_age >= 1 and obj.age > self.params["min_age_to_predict"]:
                     obj.predict()
 
-                if obj.missing_age > self.max_missing_frames:
+                if obj.missing_age > self.params["max_missing_frames"]:
                     del self.objects[obj.unique_id]
                     continue
                     
@@ -119,12 +125,31 @@ class DistanceCalculator:
 class ObjectTrackingNode(Node):
 
     def __init__(self):
-        super().__init__('tracker')
+        super().__init__('object_tracker')
+
+        self.declare_parameters(namespace='',
+                                parameters=[
+                                    ('max_missing_frames', Parameter.Type.INTEGER),
+                                    ('distance_threshold', Parameter.Type.INTEGER),
+                                    ('min_age_to_predict', Parameter.Type.INTEGER)
+                                ])
+
+        self.params = {
+            'max_missing_frames': self.get_parameter('max_missing_frames').value,
+            'distance_threshold': self.get_parameter('distance_threshold').value,
+            'min_age_to_predict': self.get_parameter('min_age_to_predict').value
+        }
+        self.get_logger().info(json.dumps(self.params, sort_keys=True, indent=4))
+
         qos_profile = QoSProfile(depth=2)
         self.tracked_objects_publisher = self.create_publisher(TrackedObjectArray, '/tracker/tracked_objects', qos_profile)
         self.detected_objects_subscription = self.create_subscription(TrackedObjectArray, '/webcam/detections',
                                                                       self.detected_objects_callback, qos_profile)
         self.object_tracker = ObjectTracker()
+        self.object_tracker.parameter_update(self.params)
+
+        self.add_on_set_parameters_callback(self.on_parameter_change)
+
 
     def detected_objects_callback(self, msg: TrackedObjectArray):
         detected_objects = msg.detections
@@ -133,6 +158,26 @@ class ObjectTrackingNode(Node):
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.detections = tracked_objects
         self.tracked_objects_publisher.publish(msg)
+
+    def on_parameter_change(self, params):
+        # Update the parameter dictionary with the new values
+        for param in params:
+            try:
+                param_name = param.name
+                param_value = param.value
+
+                param_name = param_name.split(".")
+                params_temp = self.params
+                for key in param_name[:-1]:
+                    params_temp = params_temp[key]
+                params_temp[param_name[-1]] = param_value
+                self.get_logger().info('Parameter {} updated to {}'.format(param_name, param_value))
+            except:
+                self.get_logger().warning('Parameter {} cannot updated to {}'.format(param_name, param_value))
+                return SetParametersResult(successful=False)
+            
+        self.object_tracker.parameter_update(self.params)
+        return SetParametersResult(successful=True)
 
 
 def main(args=None):

@@ -17,21 +17,21 @@ object_detector:
       - "--log-level=silent"
     visualization:
       colors:
-        red: [255, 0, 0, 255]
-        green: [20, 255, 50, 255]
+        object: [255, 0, 0, 255]
+        target_area: [20, 255, 50, 255]
         aqua: [0, 255, 255, 255]
       thick: 2
       font_size: 32
       margin:
         width_ratio: 0.25
         height_ratio: 0.1
-      topic: "/webcam/detections"
+      topic: "/tracker/tracked_objects"
     model:
       detection_path: "/home/iha/Desktop/eflatun_ws/models/yolov8n_iha_v3.onnx"
       labels_path: "/home/iha/Desktop/eflatun_ws/models/labels.txt"
       detection_gap_ratio: 0.1
       confidence: 0.3 #! implement this
-    rtp_ip: "rtp://192.168.1.2:1234"
+    rtp_ip: "rtp://192.168.1.4:1234"
     bitrate:
       stream: 15  # MBPS
-      video: 50  # MBPS
+      video: 5  # MBPS
