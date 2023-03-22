@@ -13,6 +13,7 @@ setup(
             ]
         ),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/launch', ['launch/software_in_the_loop.py']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
