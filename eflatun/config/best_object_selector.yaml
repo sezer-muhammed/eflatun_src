@@ -1,0 +1,18 @@
+best_object_selector:
+  ros__parameters:
+    frame_center:
+      x: 960
+      y: 540
+    x_range:
+      min: 480
+      max: 1440
+    y_range:
+      min: 108
+      max: 972
+    min_width: 80
+    min_height: 40
+    score_variables:
+      width_weight: 0.5
+      height_weight: 0.5
+      age_weight: 1.0
+      dist_to_center_weight: 0.2
