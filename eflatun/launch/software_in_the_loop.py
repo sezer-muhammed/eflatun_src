@@ -22,6 +22,13 @@ def generate_launch_description():
             output='screen',
             parameters=[os.path.join(get_package_share_directory('eflatun'),'config','best_object_selector.yaml')]
         ),
+        Node(
+            package='eflatun',
+            executable='vehicle_status_gui',
+            name='vehicle_status_gui',
+            output='screen',
+            parameters=[os.path.join(get_package_share_directory('eflatun'),'config','vehicle_status_gui.yaml')]
+        ),
         ExecuteProcess(
             cmd=['ros2', 'bag', 'play', '/home/sezer/uav_ws/bag_files/rosbag2_2023_03_22-19_33_53'],
             output='screen'

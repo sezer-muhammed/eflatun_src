@@ -1,5 +1,5 @@
 vehicle_status_gui:
   ros__parameters:
-    log_level: "info"
+    log_level: "debug"
     topics: ["empty",]
     frame_rate: 20
