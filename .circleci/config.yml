@@ -17,11 +17,8 @@ jobs:
             source /opt/ros/foxy/setup.bash
             mkdir ~/youfork
             ln -s ~/project ~/youfork/src
-            cd ~/youfork/src
-            vcs import < youfork.repos
             cd ~/youfork
             export DEBIAN_FRONTEND=noninteractive
-            rosdep install --from-paths . --ignore-src -y
       - run:
           name: Build
           command: |
