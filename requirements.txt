@@ -1,0 +1,5 @@
+filterpy==1.4.5
+numpy==1.21.5
+PyQt5==5.15.9
+pytest==6.2.5
+scipy==1.10.1
