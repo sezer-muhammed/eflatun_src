@@ -15,7 +15,7 @@ jobs:
             source /opt/ros/foxy/setup.bash
             mkdir uav_ws
             cd uav_ws
-            pip3 install -r requirements.txt
+            pip install -r requirements.txt
             git clone https://github.com/sezer-muhammed/eflatun_src.git
             colcon build
             . install/setup.bash

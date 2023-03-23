@@ -9,7 +9,7 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name + '/launch', ['launch/software_in_the_loop.py']),
+        ('share/' + package_name + '/launch', ['launch/software_in_the_loop.py', 'launch/pixhawk_test.py']),
         ('share/' + package_name + '/config', ['config/object_tracker.yaml', 'config/object_detector.yaml', 'config/best_object_selector.yaml']), 
     ],
     install_requires=['setuptools'],
