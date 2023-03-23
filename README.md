@@ -1,5 +1,7 @@
 # eflatun
 
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/sezer-muhammed/eflatun_src/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/sezer-muhammed/eflatun_src/tree/master)
+
 ## Overview
 
 Eflatun is a ROS2 package developed for detecting and tracking fixed-wing airplanes. It has been specifically designed for the Teknofest 2023 event. The package is intended for robotic and computer vision applications and leverages a customized version of the Jetson Inference library for high-performance object detection, achieving up to 85 FPS with YOLOv8n.
