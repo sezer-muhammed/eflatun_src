@@ -1,6 +1,16 @@
 # eflatun
 
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/sezer-muhammed/eflatun_src/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/sezer-muhammed/eflatun_src/tree/master)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/sezer-muhammed/eflatun_src/tree/master.svg?style=shield&circle-token=1234567890abcdefghijklmnopqrstuvwxyz)](https://circleci.com/gh/sezer-muhammed/eflatun_src)
+
+This is a ROS2 package that does something cool. The CircleCI badge above shows the current status of the test pipeline for the `master` branch of the repository. 
+
+Here's what the different colors mean:
+- ![#00C853](https://via.placeholder.com/15/00C853/000000?text=+) `Green`: all tests passed
+- ![#FFD600](https://via.placeholder.com/15/FFD600/000000?text=+) `Yellow`: some tests failed or errored
+- ![#F44336](https://via.placeholder.com/15/F44336/000000?text=+) `Red`: all tests failed or errored
+
+If the badge is `Yellow` or `Red`, you should investigate the test failures or errors and fix them before merging changes to the `master` branch.
+
 
 ## Overview
 
