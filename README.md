@@ -48,15 +48,15 @@ The Usage section should include detailed examples demonstrating how to use the 
 
 ### object_detector
 
-In this section, provide a detailed description of the `object_detector` node, explaining its purpose and functionality.
+The `object_detector` node is responsible for detecting objects in a video stream. It processes the video frames and identifies objects based on the provided model. The node does not subscribe to any topics.
 
 #### Published Topics
 
-List and describe the topics published by the `object_detector` node.
+- `/webcam/detections` (eflatun_msgs/TrackedObjectArray): A list of detected objects in the video stream, including their positions, sizes, and class IDs. This topic is published by the object detection node and consumed by the `object_tracker` node for further processing and tracking.
 
 #### Subscribed Topics
 
-List and describe the topics to which the `object_detector` node subscribes.
+The `object_detector` node does not subscribe to any topics.
 
 ### object_tracker
 
