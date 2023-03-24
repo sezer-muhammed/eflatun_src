@@ -56,7 +56,7 @@ This package provides ROS2 nodes for object detection and tracking using YOLOv8 
 4. [Usage](#usage)
 5. [Node Descriptions](#node-descriptions)
     - [object_detector](#object_detector)
-    - [object_tracker](#object_tracker)
+    - [object_tracker](#Object Tracking)
     - [Best Object Selector](#best-object-selector)
     - [Vehicle Status](#vehicle-status)
 6. [Parameters](#parameters)
@@ -97,7 +97,7 @@ _Include a detailed description of the `object_detector` node._
 
 - `/` (To be specified)
 
-### Object Tracking Node
+### Object Tracking
 
 The Object Tracking Node subscribes to object detections and tracks the objects across frames. It publishes an updated list of tracked objects.
 
@@ -167,8 +167,19 @@ _Provide guidelines for anyone interested in contributing to the project, includ
 
 ## License
 
-_Specify the license under which the package is distributed._
+This project is free to use, but you must give proper reference to the original authors when utilizing any part of it in your work. By using this project, you acknowledge and agree to this requirement. Please make sure to cite our work appropriately to give credit to our team.
+
+```
+Eflatun (2023). Object Detection and Tracking on Fixed Wing Airplanes. Version 0.0.1. [Source Code]. Available at: https://github.com/sezer-muhammed/eflatun-src
+```
 
 ## Contact Information
 
-_Provide contact information for the package maintainers, such as an email address or a link to a support forum._
+If you have any questions or need support, feel free to reach out to our team members:
+
+- **Şevval Belkıs Dikkaya**: Head of the team, working on software, electronics, and mechanics. [LinkedIn](https://www.linkedin.com/in/sbdikkaya/)
+- **Muhammed Sezer**: Responsible for electronics and software, and the maintainer of this package. [LinkedIn](https://www.linkedin.com/in/muhammed-sezer-160428208/)
+- **Metehan İçöz**: Responsible for mechanics. [LinkedIn](https://www.linkedin.com/in/metehan-içöz-735bab206/)
+- **Zeynep Keleş**: Working on software, electronics, and mechanics. [LinkedIn](https://www.linkedin.com/in/zeynep-bilge-keleş-7ba917255/)
+
+Feel free to connect with us on LinkedIn and mention any specific questions or issues related to the project. We'll be happy to help!
