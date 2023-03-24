@@ -1,130 +1,146 @@
-# eflatun
+# Object Detection and Tracking ROS2 Package
 
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/sezer-muhammed/eflatun_src/tree/master.svg?style=shield&circle-token=1234567890abcdefghijklmnopqrstuvwxyz)](https://circleci.com/gh/sezer-muhammed/eflatun_src)
+Here are comprehensive suggestions for revising the README:
 
-The CircleCI badge above shows the current status of the test pipeline for the `master` branch of the repository. 
+Introduction: Expand the introduction section to include a brief overview of the main features, capabilities, and use cases of the package.
 
-Here's what the different colors mean:
-- ![#00C853](https://via.placeholder.com/15/00C853/000000?text=+) `Green`: all tests passed
-- ![#FFD600](https://via.placeholder.com/15/FFD600/000000?text=+) `Yellow`: some tests failed or errored
-- ![#F44336](https://via.placeholder.com/15/F44336/000000?text=+) `Red`: all tests failed or errored
+Dependencies: Clearly list and explain all external dependencies required for the package to work, including specific versions if necessary. Add instructions for installing these dependencies.
 
-## Overview
+Installation: Provide step-by-step installation instructions for the package. Include information on installing the package from source or using a package manager, if applicable.
 
-Eflatun is a ROS2 package developed for detecting and tracking fixed-wing airplanes. It has been specifically designed for the Teknofest 2023 event. The package is intended for robotic and computer vision applications and leverages a customized version of the Jetson Inference library for high-performance object detection, achieving up to 85 FPS with YOLOv8n.
+Usage: Enhance the "Usage" section with detailed examples demonstrating how to use the package. Include code snippets, terminal commands, or configuration files to help users understand the package's functionality better.
 
-The package consists of several nodes that work together to accomplish the task of detection and tracking:
+Node Descriptions: For each node, add more information on its purpose and functionality. Include any additional details that would help users understand how to use and configure each node.
 
-- `object_detector`: Detects objects and publishes information about them.
-- `object_tracker`: Assigns unique IDs to detected objects for tracking purposes.
-- `best_object_selector`: Selects the best object to track based on certain criteria.
-- `vehicle_status_gui`: Visualizes the tracked object and provides a user interface for controlling the ROS2 nodes.
+Parameters: In the "Parameters" section, use tables to organize the parameters for better readability. For each parameter, include its name, a brief description, and its default value.
 
-The eflatun package is actively maintained and supported, with plans for future updates and improvements.
+Messages: Similar to the "Parameters" section, use tables to organize the custom messages. For each message, include its name, fields, and a brief description of its purpose.
 
+Code Examples: Provide more examples demonstrating how to use the package in various scenarios. Include code snippets or configuration files to give users a clear understanding of how to implement the package in their projects.
+
+Troubleshooting: In the "Troubleshooting" section, include common issues users might face and their solutions. This section will help users quickly identify and resolve any problems they encounter while using the package.
+
+Contributing: Add guidelines for contributing to the project, such as submitting issues, creating pull requests, or participating in the development process.
+
+Screenshots or Demo: Include screenshots or demo videos showcasing the package in action to give users a visual understanding of its capabilities.
+
+API Documentation: If available, link to API documentation or create a separate documentation section detailing the package's classes, methods, and functions.
+
+Changelog: Maintain a changelog or release notes section to document the package's version history and any significant changes or updates.
+
+FAQ: Add a frequently asked questions (FAQ) section to address common questions users might have about the package.
+
+By incorporating these suggestions, you will create a comprehensive and user-friendly README, making it easier for users to understand and effectively use the package.
+
+This package provides ROS2 nodes for object detection and tracking using YOLOv8 neural network model on NVIDIA Jetson devices.
+
+## Table of Contents
+
+1. [Introduction](#introduction)
+2. [Dependencies](#dependencies)
+3. [Installation](#installation)
+4. [Usage](#usage)
+5. [Node Descriptions](#node-descriptions)
+    - [object_detector](#object_detector)
+    - [object_tracker](#object_tracker)
+    - [Best Object Selector](#best-object-selector)
+    - [Vehicle Status](#vehicle-status)
+6. [Parameters](#parameters)
+7. [Messages](#messages)
+8. [Code Examples](#code-examples)
+9. [Troubleshooting](#troubleshooting)
+10. [Contributing](#contributing)
+11. [License](#license)
+12. [Contact Information](#contact-information)
+
+## Introduction
+
+_Briefly introduce the purpose of the package and its main features._
+
+## Dependencies
+
+_List any external dependencies and the necessary steps for their installation._
 
 ## Installation
 
-### Prerequisites
+_Provide clear instructions on how to install the package, including any necessary environment setup or configuration._
 
-### Building the Package
+## Usage
 
-## Nodes
+_Add a separate "Usage" section that provides examples and guidance on how to use the package in various scenarios._
 
-### object_tracker
-
-The `object_tracker` node is responsible for tracking detected fixed-wing airplanes using the custom messages `TrackedObject` and `TrackedObjectArray`. It receives detected objects from the `detector` node and maintains a list of tracked objects with unique IDs. The node updates the position of the tracked objects and predicts their location if they are missing for a certain number of frames. It also removes objects that have been missing for more than a specified number of frames. The node publishes the tracked objects as `TrackedObjectArray` messages.
-
-The node is implemented in the `ObjectTracker` and `ObjectTrackingNode` classes. The `ObjectTracker` class handles object tracking, while the `ObjectTrackingNode` class is responsible for ROS2-related functionality like parameter handling, subscriptions, and publishing.
-
-Parameters for the `object_tracker` node include:
-
-- `log_level`: The logging level for the node (e.g., "info", "debug", "warn", etc.).
-- `max_missing_frames`: The maximum number of frames an object can be missing before it is removed from tracking.
-- `distance_threshold`: The maximum distance between a detected object and a tracked object for them to be considered the same object.
-- `min_age_to_predict`: The minimum age of an object before its location can be predicted if it is missing.
-
-The node subscribes to the `/webcam/detections` topic to receive detected objects and publishes the tracked objects on the `/tracker/tracked_objects` topic.
-
+## Node Descriptions
 
 ### object_detector
 
-This package provides a ROS2 node for object detection using YOLOv8n neural network model on NVIDIA Jetson devices.
+_Include a detailed description of the `object_detector` node._
 
-#### Parameters
+#### Published Topics
 
-The node reads the following parameters from the ROS2 parameter server:
+- `/webcam/detections`
 
-- `log_level`: Log level for the node. Possible values are `"debug"`, `"info"`, `"warn"`, `"error"`, and `"fatal"`. Default value is `"info"`.
-- `use_device`: Specifies which device to use. Possible values are `"video"` and `"cam"`. Default value is `"video"`.
-- `video`: Parameters for video device. If `use_device` is set to `"video"`, these parameters are used. Contains the following fields:
-    - `device`: Path to video file to be used as input.
-    - `save_path`: Path to save the output video.
-    - `round`: Number of times the video is to be looped. Default value is `1`.
-- `cam`: Parameters for camera device. If `use_device` is set to `"cam"`, these parameters are used. Contains the following fields:
-    - `device`: Path to camera device.
-    - `save_path`: Path to save the output video.
-    - `round`: Number of times the video is to be looped. Default value is `1`.
-- `video_width`: Width of the video frame. Default value is `1920`.
-- `video_height`: Height of the video frame. Default value is `1080`.
-- `camera_args`: Arguments to be passed to the camera device. Default value is `["--input-width=1920", "--input-height=1080", "--log-level=silent"]`.
-- `visualization`: Parameters for visualization of detected objects. Contains the following fields:
-    - `colors`: Dictionary containing color values for different elements. Contains the following fields:
-        - `object`: Color for object bounding box.
-        - `target_area`: Color for target area bounding box.
-        - `aqua`: Color for text overlay.
-    - `thick`: Thickness of bounding box lines.
-    - `font_size`: Font size for text overlay.
-    - `margin`: Margin values for target area bounding box. Contains the following fields:
-        - `width_ratio`: Width ratio of margin. Default value is `0.25`.
-        - `height_ratio`: Height ratio of margin. Default value is `0.1`.
-    - `topic`: ROS2 topic to subscribe for object detections. Default value is `"/tracker/tracked_objects"`.
-- `model`: Parameters for object detection model. Contains the following fields:
-    - `detection_path`: Path to object detection model file.
-    - `labels_path`: Path to object detection model labels file.
-    - `detection_gap_ratio`: Ratio of the frame to be used for object detection. Default value is `0.1`.
-    - `confidence`: Minimum confidence threshold for object detection. Default value is `0.3`.
-- `rtp_ip`: IP address of the destination for RTP streaming. Default value is `"rtp://192.168.1.4:1234"`.
-- `bitrate`: Bitrate values for stream and output videos. Contains the following fields:
-    - `stream`: Bitrate for RTP streaming in MBPS. Default value is `15`.
-    - `video`: Bitrate for output video in MBPS. Default value is `5`.
+#### Subscribed Topics
 
-### object
+- `/` (To be specified)
 
-### Best Object Selector Node
+### object_tracker
 
-The Best Object Selector node is a ROS2 node that subscribes to a topic containing a list of tracked objects and selects the best object based on some criteria. The selected object is published to a different topic.
+_Include a detailed description of the `object_tracker` node._
 
-#### Workflow
+#### Subscribed Topics
 
-The node subscribes to the `/tracker/tracked_objects` topic, which contains a list of tracked objects. For each object, the node calculates a score based on its width, height, age, and distance to a fixed center point. The object with the highest score is selected and published to the `/tracker/best_object` topic.
+- `/webcam/detections`
 
-#### Parameters
+#### Published Topics
 
-The behavior of the node can be configured using the following ROS2 parameters:
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| log_level | string | info | Log level of the node |
-| frame_center.x | integer | 960 | x coordinate of the center of the frame |
-| frame_center.y | integer | 580 | y coordinate of the center of the frame |
-| x_range.min | integer | 480 | minimum x coordinate of the frame |
-| x_range.max | integer | 1440 | maximum x coordinate of the frame |
-| y_range.min | integer | 108 | minimum y coordinate of the frame |
-| y_range.max | integer | 972 | maximum y coordinate of the frame |
-| min_width | integer | 80 | minimum width of the object to be considered |
-| min_height | integer | 40 | minimum height of the object to be considered |
-| score_variables.width_weight | double | 0.5 | weight of the object's width in the scoring formula |
-| score_variables.height_weight | double | 0.5 | weight of the object's height in the scoring formula |
-| score_variables.age_weight | double | 1.0 | weight of the object's age in the scoring formula |
-| score_variables.dist_to_center_weight | double | 0.2 | weight of the distance to the frame center in the scoring formula |
+- `/tracker/tracked`
 
+### Best Object Selector
 
-### vehicle_status_gui
+_Include a detailed description of the Best Object Selector node._
 
-## Custom Message Types
+#### Subscribed Topics
 
-### TrackedObject
+- `/tracker/tracked_objects`
 
-### TrackedObjectArray
+#### Published Topics
+
+- `/tracker/best_object`
+
+### Vehicle Status
+
+_Include a detailed description of the Vehicle Status node._
+
+#### Subscribed Topics
+
+- `/mavros/battery`
+- `/mavros/global_position/global`
+- `/mavros/local_position/velocity_local`
+
+## Parameters
+
+_Organize the parameters in tables with columns for the parameter name, description, and default value._
+
+## Messages
+
+_Organize the custom messages in tables with columns for the message name, fields, and descriptions._
+
+## Code Examples
+
+_Include code snippets or examples that demonstrate how to use the package in different scenarios._
+
+## Troubleshooting
+
+_Add a section with common issues and their solutions._
+
+## Contributing
+
+_Provide guidelines for anyone interested in contributing to the project, including information on submitting issues or pull requests._
 
 ## License
+
+_Specify the license under which the package is distributed._
+
+## Contact Information
+
+_Provide contact information for the package maintainers, such as an email address or a link to a support forum._
