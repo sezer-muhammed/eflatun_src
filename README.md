@@ -83,17 +83,31 @@ _Include a detailed description of the `object_detector` node._
 
 - `/` (To be specified)
 
-### object_tracker
+### Object Tracking Node
 
-_Include a detailed description of the `object_tracker` node._
+The Object Tracking Node subscribes to object detections and tracks the objects across frames. It publishes an updated list of tracked objects.
 
-#### Subscribed Topics
+#### Node Details
 
-- `/webcam/detections`
+**Subscribed Topic**: `/webcam/detections` (eflatun_msgs/TrackedObjectArray)
 
-#### Published Topics
+**Published Topic**: `/tracker/tracked_objects` (eflatun_msgs/TrackedObjectArray)
 
-- `/tracker/tracked`
+#### Parameters
+
+| Parameter          | Type    | Default | Description                                        |
+|--------------------|---------|---------|----------------------------------------------------|
+| log_level          | String  | info    | The logging level (debug, info, warn, error, fatal)|
+| max_missing_frames | Integer | 5       | Maximum number of missing frames before an object is removed |
+| distance_threshold | Integer | 30      | Maximum distance (in pixels) to consider objects as the same |
+| min_age_to_predict | Integer | 3       | Minimum age of an object to start predicting its location when missing |
+
+#### Suggestions for Improvement
+
+1. Implement dynamic reconfigure for parameter updates.
+2. Add a visualization tool to display the tracked objects.
+3. Allow different distance metrics for object matching.
+4. Implement a more advanced object prediction algorithm.
 
 ### Best Object Selector
 
