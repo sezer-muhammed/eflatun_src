@@ -25,7 +25,7 @@
 
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import QoSProfile
+from rclpy.qos import QoSProfile, qos_profile_sensor_data
 from rclpy.parameter import Parameter
 from rcl_interfaces.msg import SetParametersResult
 from rclpy.logging import LoggingSeverity
@@ -155,10 +155,9 @@ class ObjectTrackingNode(Node):
 
         self.get_logger().info(json.dumps(self.params, sort_keys=True, indent=4))
 
-        qos_profile = QoSProfile(depth=2)
-        self.tracked_objects_publisher = self.create_publisher(TrackedObjectArray, '/tracker/tracked_objects', qos_profile)
+        self.tracked_objects_publisher = self.create_publisher(TrackedObjectArray, '/tracker/tracked_objects', qos_profile_sensor_data)
         self.detected_objects_subscription = self.create_subscription(TrackedObjectArray, '/webcam/detections',
-                                                                      self.detected_objects_callback, qos_profile)
+                                                                      self.detected_objects_callback, qos_profile_sensor_data)
         self.object_tracker = ObjectTracker()
         self.object_tracker.parameter_update(self.params)
 

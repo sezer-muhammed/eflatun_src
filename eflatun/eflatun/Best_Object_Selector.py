@@ -3,6 +3,7 @@ from rclpy.node import Node
 from rclpy.parameter import Parameter
 from rclpy.logging import LoggingSeverity
 from rcl_interfaces.msg import SetParametersResult
+from rclpy.qos import qos_profile_sensor_data
 
 import json
 
@@ -73,12 +74,12 @@ class BestObjectSelector(Node):
             TrackedObjectArray,
             '/tracker/tracked_objects',
             self.listener_callback,
-            2)
+            qos_profile_sensor_data)
 
         self.publisher = self.create_publisher(
             TrackedObject,
             '/tracker/best_object',
-            2)
+            qos_profile_sensor_data)
 
 
     def calculate_score(self, tracked_object: Object) -> float:

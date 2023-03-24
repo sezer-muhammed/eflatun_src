@@ -6,6 +6,7 @@ from rclpy.node import Node
 from rclpy.parameter import Parameter
 from rcl_interfaces.msg import SetParametersResult
 from rclpy.logging import LoggingSeverity
+from rclpy.qos import qos_profile_sensor_data
 from eflatun_msgs.msg import TrackedObject, TrackedObjectArray
 
 import os
@@ -130,9 +131,9 @@ class JetsonDetector(Node):
             self.params[self.params["use_device"]]["save_path"],
             argv=["--headless", f"--bitrate={self.params['bitrate']['video'] * 1024 * 1024}", "--log-level=silent"])
 
-        self.detections_publisher = self.create_publisher(TrackedObjectArray, "/webcam/detections", 1)
+        self.detections_publisher = self.create_publisher(TrackedObjectArray, "/webcam/detections", qos_profile_sensor_data)
 
-        self.create_subscription(TrackedObjectArray, self.params["visualization"]["topic"], self.stream_frame, 1)
+        self.create_subscription(TrackedObjectArray, self.params["visualization"]["topic"], self.stream_frame, qos_profile_sensor_data)
 
         self.font = jetson.utils.cudaFont(size=32)
 
