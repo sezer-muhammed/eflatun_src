@@ -1,46 +1,50 @@
 # Object Detection and Tracking ROS2 Package
 
-## Here are comprehensive suggestions for revising the README:
+### Here are comprehensive suggestions for revising the README:
 
-# Introduction: Expand the introduction section to include a brief overview of the main features, capabilities, and use cases of the package.
+#### Introduction: 
+Expand the introduction section to include a brief overview of the main features, capabilities, and use cases of the package.
 
-# Dependencies: Clearly list and explain all external dependencies required for the package to work, including specific versions if necessary. Add instructions for installing these dependencies.
+#### Dependencies: 
+Clearly list and explain all external dependencies required for the package to work, including specific versions if necessary. Add instructions for installing these dependencies.
 
-# Installation: Provide step-by-step installation instructions for the package. Include information on installing the package from source or using a package manager, if applicable.
+#### Installation: 
+Provide step-by-step installation instructions for the package. Include information on installing the package from source or using a package manager, if applicable.
 
-# Usage: Enhance the "Usage" section with detailed examples demonstrating how to use the package. Include code snippets, terminal commands, or configuration files to help users understand the package's functionality better.
+#### Usage: 
+Enhance the "Usage" section with detailed examples demonstrating how to use the package. Include code snippets, terminal commands, or configuration files to help users understand the package's functionality better.
 
-# Node Descriptions: 
+#### Node Descriptions: 
 For each node, add more information on its purpose and functionality. Include any additional details that would help users understand how to use and configure each node.
 
-# Parameters: 
+#### Parameters: 
 In the "Parameters" section, use tables to organize the parameters for better readability. For each parameter, include its name, a brief description, and its default value.
 
-# Messages: 
+#### Messages: 
 Similar to the "Parameters" section, use tables to organize the custom messages. For each message, include its name, fields, and a brief description of its purpose.
 
-# Code Examples: 
+#### Code Examples: 
 Provide more examples demonstrating how to use the package in various scenarios. Include code snippets or configuration files to give users a clear understanding of how to implement the package in their projects.
 
-# Troubleshooting: 
+#### Troubleshooting: 
 In the "Troubleshooting" section, include common issues users might face and their solutions. This section will help users quickly identify and resolve any problems they encounter while using the package.
 
-# Contributing: 
+#### Contributing: 
 Add guidelines for contributing to the project, such as submitting issues, creating pull requests, or participating in the development process.
 
-# Screenshots or Demo: 
+#### Screenshots or Demo: 
 Include screenshots or demo videos showcasing the package in action to give users a visual understanding of its capabilities.
 
-# API Documentation: 
+#### API Documentation: 
 If available, link to API documentation or create a separate documentation section detailing the package's classes, methods, and functions.
 
-# Changelog: 
+#### Changelog: 
 Maintain a changelog or release notes section to document the package's version history and any significant changes or updates.
 
-# FAQ: 
+#### FAQ: 
 Add a frequently asked questions (FAQ) section to address common questions users might have about the package.
 
-# By incorporating these suggestions, you will create a comprehensive and user-friendly README, making it easier for users to understand and effectively use the package.
+#### By incorporating these suggestions, you will create a comprehensive and user-friendly README, making it easier for users to understand and effectively use the package.
 
 This package provides ROS2 nodes for object detection and tracking using YOLOv8 neural network model on NVIDIA Jetson devices.
 
