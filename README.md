@@ -1,3 +1,14 @@
+# Contact Information
+
+If you have any questions or need support, feel free to reach out to our team members:
+
+- **Şevval Belkıs Dikkaya**: Head of the team, working on software, electronics, and mechanics. [LinkedIn](https://www.linkedin.com/in/sbdikkaya/)
+- **Muhammed Sezer**: Responsible for electronics and software, and the maintainer of this package. [LinkedIn](https://www.linkedin.com/in/muhammed-sezer-160428208/)
+- **Metehan İçöz**: Responsible for mechanics. [LinkedIn](https://www.linkedin.com/in/metehan-içöz-735bab206/)
+- **Zeynep Keleş**: Working on software, electronics, and mechanics. [LinkedIn](https://www.linkedin.com/in/zeynep-bilge-keleş-7ba917255/)
+
+Feel free to connect with us on LinkedIn and mention any specific questions or issues related to the project. We'll be happy to help!
+
 # Object Detection and Tracking ROS2 Package
 
 ## Table of Contents
@@ -26,7 +37,6 @@
 10. [Contributing](#contributing)
 11. [License](#license)
 12. [Hardware Used](#hardware-used)
-13. [Contact Information](#contact-information)
 
 ## Introduction
 
@@ -238,13 +248,3 @@ In this project, we utilized the following hardware components to achieve object
   - LIDAR: For real-time distance measurements, allowing the airplane to maintain a safe distance from obstacles and terrain.
 
 Make sure you have compatible hardware components when using this project in your own fixed wing airplane setup. Detailed specifications and connection diagrams can be found in the documentation.
-## Contact Information
-
-If you have any questions or need support, feel free to reach out to our team members:
-
-- **Şevval Belkıs Dikkaya**: Head of the team, working on software, electronics, and mechanics. [LinkedIn](https://www.linkedin.com/in/sbdikkaya/)
-- **Muhammed Sezer**: Responsible for electronics and software, and the maintainer of this package. [LinkedIn](https://www.linkedin.com/in/muhammed-sezer-160428208/)
-- **Metehan İçöz**: Responsible for mechanics. [LinkedIn](https://www.linkedin.com/in/metehan-içöz-735bab206/)
-- **Zeynep Keleş**: Working on software, electronics, and mechanics. [LinkedIn](https://www.linkedin.com/in/zeynep-bilge-keleş-7ba917255/)
-
-Feel free to connect with us on LinkedIn and mention any specific questions or issues related to the project. We'll be happy to help!
