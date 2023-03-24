@@ -60,27 +60,29 @@ List and describe the topics to which the `object_detector` node subscribes.
 
 ### object_tracker
 
-In this section, provide a detailed description of the `object_tracker` node, explaining its purpose and functionality.
+The `object_tracker` node is responsible for tracking detected objects in a video stream. It subscribes to the `/webcam/detections` topic, receives detected objects, and updates their tracking information. The tracking information is then published to the `/tracker/tracked_objects` topic.
 
 #### Published Topics
 
-List and describe the topics published by the `object_tracker` node.
+- `/tracker/tracked_objects` (eflatun_msgs/TrackedObjectArray): A list of tracked objects, containing their unique IDs, positions, sizes, and ages.
 
 #### Subscribed Topics
 
-List and describe the topics to which the `object_tracker` node subscribes.
+- `/webcam/detections` (eflatun_msgs/TrackedObjectArray): A list of detected objects in the video stream, published by the object detection node.
+
 
 ### best_object_selector
 
-In this section, provide a detailed description of the `best_object_selector` node, explaining its purpose and functionality.
+The `best_object_selector` is a ROS node responsible for selecting the best object from a list of tracked objects. It subscribes to the `/tracker/tracked_objects` topic, calculates a score for each object based on its properties (width, height, age, and distance to center), and publishes the best object to the `/tracker/best_object` topic. It also takes into account the minimum size of an object and if it lies within the specified range.
 
 #### Published Topics
 
-List and describe the topics published by the `best_object_selector` node.
+- `/tracker/best_object` (eflatun_msgs/TrackedObject): The best object selected based on the calculated score.
 
 #### Subscribed Topics
 
-List and describe the topics to which the `best_object_selector` node subscribes.
+- `/tracker/tracked_objects` (eflatun_msgs/TrackedObjectArray): A list of tracked objects published by the object tracker.
+
 
 ### vehicle_status
 
@@ -126,6 +128,24 @@ List and describe the topics to which the `vehicle_status` node subscribes.
 | rtp_ip | rtp://192.168.1.4:1234 | RTP IP for video streaming |
 | bitrate.stream | 15 | Streaming bitrate in MBPS |
 | bitrate.video | 5 | Video bitrate in MBPS |
+
+
+### object_tracker
+
+| Parameter                    | Default Value                                         | Description                                                   |
+|------------------------------|-------------------------------------------------------|---------------------------------------------------------------|
+| log_level                    | debug                                                 | The logging level (debug, info, warn, error, fatal)          |
+| max_missing_frames           | 30                                                    | Maximum number of missing frames before an object is removed |
+| distance_threshold           | 200                                                   | Distance threshold for object association                     |
+| min_age_to_predict           | 5                                                     | Minimum age of an object for prediction                       |
+
+### vehicle_status_gui
+
+| Parameter                    | Default Value                                         | Description                                                   |
+|------------------------------|-------------------------------------------------------|---------------------------------------------------------------|
+| log_level                    | debug                                                 | The logging level (debug, info, warn, error, fatal)          |
+| topics                       | ["empty",]                                            | Topics to visualize TrackedDetectionArray or TrackedDetection |
+| frame_rate                   | 20                                                    | Frame rate for visualization                                  |
 
 
 ### best_object_selector
