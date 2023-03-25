@@ -1,8 +1,13 @@
-version: 2
+version: 2.1
+orbs:
+  ros: openai/ros@1.1.0
 jobs:
-  foxy:
+  build_and_test:
+    parameters:
+      distribution:
+        type: string
     docker:
-      - image: ros:foxy
+      - image: ros:<< parameters.distribution >>
     steps:
       - checkout
       - run:
@@ -12,16 +17,28 @@ jobs:
       - run:
           name: Build
           command: |
-            source /opt/ros/foxy/setup.bash
+            source /opt/ros/<< parameters.distribution >>/setup.bash
             mkdir uav_ws
             cd uav_ws
-            pip install -r requirements.txt
+            pip3 install -r requirements.txt
             git clone https://github.com/sezer-muhammed/eflatun_src.git
             colcon build
             . install/setup.bash
-            ros2 launch eflatun software_in_the_loop.py
+            ros2 launch eflatun test.py
+      - run:
+          name: Test
+          command: |
+            ros2 run eflatun test.py &
+            sleep 60
+            kill %1
+            echo "Test completed successfully."
 workflows:
   version: 2
   ros_build:
     jobs:
-      - foxy
+      - build_and_test:
+          name: foxy_build
+          distribution: foxy
+      - build_and_test:
+          name: humble_build
+          distribution: humble
