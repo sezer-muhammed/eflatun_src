@@ -11,6 +11,7 @@ from std_msgs.msg import UInt32
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem
+from PyQt5.QtCore import QObject, pyqtSignal, QThread
 
 class MavrosSubscriber(Node):
 
@@ -31,8 +32,15 @@ class MavrosSubscriber(Node):
         self.create_subscription(TwistStamped, '/mavros/mavros/raw/gps_vel', self.update_raw_gps_vel, qos_profile_sensor_data)
         self.create_subscription(UInt32, '/mavros/mavros/raw/satellites', self.update_raw_satellites, qos_profile_sensor_data)
 
-        x = threading.Thread(target=self.threading_gui, args=())
-        x.start()
+        gui_thread = QThread()
+        self.mavros_gui = MavrosGUI()
+        self.mavros_gui.moveToThread(gui_thread)
+        gui_thread.started.connect(self.mavros_gui.run)
+        self.mavros_gui.finished.connect(gui_thread.quit)
+        self.mavros_gui.finished.connect(self.mavros_gui.deleteLater)
+        gui_thread.finished.connect(gui_thread.deleteLater)
+
+        gui_thread.start()
 
     def threading_gui(self):
         self.app = QApplication(sys.argv)
@@ -95,18 +103,18 @@ class MavrosGUI(QWidget):
         self.table = QTableWidget(12, 2)
         self.table.setHorizontalHeaderLabels(['Topic', 'Value'])
         self.table.setVerticalHeaderLabels([
-            '/diagnostics',
-            '/mavros/battery',
-            '/mavros/mavros/data',
-            '/mavros/mavros/data_raw',
-            '/mavros/mavros/diff_pressure',
-            '/mavros/mavros/in',
-            '/mavros/mavros/mag',
-            '/mavros/mavros/out',
-            '/mavros/mavros/output',
-            '/mavros/mavros/raw/fix',
-            '/mavros/mavros/raw/gps_vel',
-            '/mavros/mavros/raw/satellites',
+            'diagnostics',
+            'battery',
+            'data',
+            'raw/data',
+            'diff_pressure',
+            'in',
+            'mag',
+            'out',
+            'output',
+            'raw/fix',
+            'raw/gps_vel',
+            'raw/satellites',
         ])
         self.table.horizontalHeader().setStretchLastSection(True)
 
