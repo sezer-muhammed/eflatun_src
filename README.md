@@ -139,11 +139,11 @@ The `vehicle_status` node doesn't publish to any topics.
 |------------------------------|-------------------------------------------------------|---------------------------------------------------------------|
 | log_level                    | debug                                                 | The logging level (debug, info, warn, error, fatal)          |
 | use_device                   | video                                                 | Choose between "video" and "cam" for input source            |
-| video.device                 | file:///home/iha/Desktop/eflatun_ws/videos/sample_detection_video_v1.mp4 | The video file used as input                                  |
-| video.save_path              | /home/iha/Desktop/eflatun_ws/videos/output_videos/test_video_Eflatun_IHA_TODO.mp4 | The output video file path                                    |
+| video.device                 | file:///path/to/video.mp4 | The video file used as input                                  |
+| video.save_path              | /path/to/save/file.mp4 | The output video file path                                    |
 | video.round                  | 1                                                     | Round parameter for video processing                          |
 | cam.device                   | v4l2:///dev/video0                                    | The camera device used as input                               |
-| cam.save_path                | TODO_Eflatun_IHA_TODO.mp4                             | The output video file path for camera input                   |
+| cam.save_path                | /path/to/save/file.mp4                             | The output video file path for camera input                   |
 | cam.round                    | 1                                                     | Round parameter for camera processing                         |
 | video_width                  | 1920                                                  | Video width                                                   |
 | video_height                 | 1080                                                  | Video height                                                  |
@@ -156,8 +156,8 @@ The `vehicle_status` node doesn't publish to any topics.
 | visualization.margin.width_ratio | 0.25 | Width margin ratio for visualization elements |
 | visualization.margin.height_ratio | 0.1 | Height margin ratio for visualization elements |
 | visualization.topic | /tracker/tracked_objects | Topic for the TrackedObjects messages |
-| model.detection_path | /home/iha/Desktop/eflatun_ws/models/yolov8n_iha_v3.onnx | Path to the object detection model file |
-| model.labels_path | /home/iha/Desktop/eflatun_ws/models/labels.txt | Path to the labels file |
+| model.detection_path | /path/to/model.onnx | Path to the object detection model file |
+| model.labels_path | /path/to/labels.txt | Path to the labels file |
 | model.detection_gap_ratio | 0.1 | The gap ratio for object detection |
 | model.confidence | 0.3 | Confidence threshold for object detection |
 | rtp_ip | rtp://192.168.1.4:1234 | RTP IP for video streaming |
