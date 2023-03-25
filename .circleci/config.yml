@@ -13,6 +13,10 @@ jobs:
           command: |
             apt-get update
       - run:
+          name: Install pip3
+          command: |
+            apt-get install -y python3-pip
+      - run:
           name: Build
           command: |
             source /opt/ros/<< parameters.distribution >>/setup.bash
