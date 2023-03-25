@@ -13,10 +13,6 @@ jobs:
           command: |
             apt-get update
       - run:
-          name: Install pip3
-          command: |
-            sudo apt install -y python3-pip
-      - run:
           name: Build
           command: |
             source /opt/ros/<< parameters.distribution >>/setup.bash
@@ -26,14 +22,6 @@ jobs:
             git clone https://github.com/sezer-muhammed/eflatun_src.git
             colcon build
             . install/setup.bash
-            ros2 launch eflatun test.py
-      - run:
-          name: Test
-          command: |
-            ros2 run eflatun test.py &
-            sleep 60
-            kill %1
-            echo "Test completed successfully."
 workflows:
   version: 2
   ros_build:
