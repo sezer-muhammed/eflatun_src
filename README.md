@@ -1,4 +1,4 @@
-Build status: [![CircleCI](https://dl.circleci.com/status-badge/img/gh/sezer-muhammed/eflatun_src/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/sezer-muhammed/eflatun_src/tree/master)
+**Build status -->** [![CircleCI](https://dl.circleci.com/status-badge/img/gh/sezer-muhammed/eflatun_src/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/sezer-muhammed/eflatun_src/tree/master)
 
 # Contact Information
 
