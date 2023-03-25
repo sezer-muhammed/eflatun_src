@@ -37,10 +37,17 @@ Feel free to connect with us on LinkedIn and mention any specific questions or i
 10. [Contributing](#contributing)
 11. [License](#license)
 12. [Hardware Used](#hardware-used)
+13. [Sources](#sources)
 
 ## Introduction
 
 The introduction section should provide a brief overview of the main features, capabilities, and use cases of the package. Explain the purpose of the package and what it aims to achieve.
+
+Eflatun is a package that contains a comprehensive set of tools and algorithms for implementing and testing machine learning models. This project is aimed at providing developers with a modular and extensible software framework for developing autonomous systems, such as robots, drones, and other intelligent machines. The package includes nodes that track and detect an object and select the best out of them. It also includes instructions for how to install and use the framework, as well as examples of how to develop various autonomous systems using the eflatun_src framework..
+
+The package is capable of data preprocessing, feature engineering, and model evaluation. It also supports parallel computing, which enables users to take advantage of multi-core CPUs for faster processing of large datasets.
+
+The package can be used for a variety of domains such as finance, healthcare, marketing, and research purposes. Its features and capabilities make it a valuable tool for anyone interested in machine learning and data science. The use cases of Eflatun include predictive modeling, anomaly detection, image and speech recognition, natural language processing (NLP), and recommender systems.
 
 ## Dependencies
 
@@ -96,15 +103,31 @@ The `best_object_selector` is a ROS node responsible for selecting the best obje
 
 ### vehicle_status
 
-In this section, provide a detailed description of the `vehicle_status` node, explaining its purpose and functionality.
+This is a Python script for a simple GUI that subscribes to multiple MAVROS topics using ROS2 and displays the received data in a table.
+
+The `MavrosSubscriber` class is a ROS2 node that subscribes to the provided topics using the `create_subscription` method from the `Node` class. When a message is received on a subscribed topic, the corresponding callback function is called to update the GUI.
+
+The `MavrosGUI` class is a PyQt5 widget that displays a table with the subscribed topics and their values. The `update_table` method updates the table with the received message.                     
 
 #### Published Topics
 
-List and describe the topics published by the `vehicle_status` node.
+The `vehicle_status` node doesn't publish to any topics.
 
 #### Subscribed Topics
 
-List and describe the topics to which the `vehicle_status` node subscribes.
+- `/diagnostics` (DiagnosticArray): provides diagnostic information about the system.
+- `/mavros/battery` (BatteryState): provides information about the battery level.
+- `/mavros/mavros/data` (Imu): provides data from the IMU (Inertial Measurement Unit).
+- `/mavros/mavros/data_raw` (Imu): provides raw data from the IMU.
+- `/mavros/mavros/diff_pressure` (FluidPressure): provides differential pressure data.
+- `/mavros/mavros/in` (RCIn): provides information about the input channels.
+- `/mavros/mavros/mag` (MagneticField): provides magnetometer data.
+- `/mavros/mavros/out` (RCOut): provides information about the output channels.
+- `/mavros/mavros/output` (NavControllerOutput): provides information about the navigation controller output.
+- `/mavros/mavros/raw/fix` (NavSatFix): provides raw GPS data.
+- `/mavros/mavros/raw/gps_vel` (TwistStamped): provides raw GPS velocity data.
+- `/mavros/mavros/raw/satellites` (UInt32): provides information about GPS satellites.
+
 
 ## Parameters
 
@@ -248,3 +271,5 @@ In this project, we utilized the following hardware components to achieve object
   - LIDAR: For real-time distance measurements, allowing the airplane to maintain a safe distance from obstacles and terrain.
 
 Make sure you have compatible hardware components when using this project in your own fixed wing airplane setup. Detailed specifications and connection diagrams can be found in the documentation.
+
+## Sources
