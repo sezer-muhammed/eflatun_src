@@ -15,14 +15,14 @@ jobs:
       - run:
           name: Install pip3
           command: |
-            apt-get install -y python3-pip
+            sudo apt install -y python3-pip
       - run:
           name: Build
           command: |
             source /opt/ros/<< parameters.distribution >>/setup.bash
             mkdir uav_ws
             cd uav_ws
-            pip3 install -r requirements.txt
+            sudo pip install -r requirements.txt
             git clone https://github.com/sezer-muhammed/eflatun_src.git
             colcon build
             . install/setup.bash
