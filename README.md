@@ -276,6 +276,6 @@ Make sure you have compatible hardware components when using this project in you
 
 ## Resources
 Here are some resources listed for deep learning:
-- **[Jetson eLinux]** (https://www.elinux.org/Jetson)
-- **[NVIDIA AI IOT]** (https://github.com/NVIDIA-AI-IOT)
-- **[ROS nodes]** (https://github.com/dusty-nv/ros_deep_learning)
+- **[Jetson eLinux](https://www.elinux.org/Jetson)**
+- **[NVIDIA AI IOT](https://github.com/NVIDIA-AI-IOT)**
+- **[ROS nodes](https://github.com/dusty-nv/ros_deep_learning)**
