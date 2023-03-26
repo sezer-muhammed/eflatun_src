@@ -259,7 +259,7 @@ Eflatun (2023). Object Detection and Tracking on Fixed Wing Airplanes. Version 0
 ## Hardware Used
 In this project, we utilized the following hardware components to achieve object detection and tracking on fixed wing airplanes:
 
-- **Airframe**: Our custom-built airframe has a wingspan of X meters and a length of Y meters. The airframe is made of lightweight, durable materials such as carbon fiber and foam, ensuring optimal flight performance and endurance.
+- **Airframe**: Our custom-built airframe has a wingspan of X meters and a length of Y meters. The airframe is made of lightweight, durable materials such as carbon fiber and foam, ensuring optimal flight performance and endurance. The hardware produced at NURUS Company.
 
 - **Flight Controller**: We used the Flight Controller Model ABC, which features advanced flight control algorithms, GPS waypoint navigation, and compatibility with a wide range of sensors and peripherals.
 
