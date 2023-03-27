@@ -1,14 +1,14 @@
 object_detector:
   ros__parameters:
-    log_level: "debug"
-    use_device: "video"  # Choose between "video" and "cam"
+    log_level: "error"
+    use_device: "cam"  # Choose between "video" and "cam"
     video:
       device: "file:///home/iha/Desktop/eflatun_ws/videos/sample_detection_video_v1.mp4"
       save_path: "/home/iha/Desktop/eflatun_ws/videos/output_videos/test_video_Eflatun_IHA_TODO.mp4"
       round: 1
     cam:
       device: "v4l2:///dev/video0"
-      save_path: "TODO_Eflatun_IHA_TODO.mp4"
+      save_path: "/home/iha/Desktop/eflatun_ws/videos/output_videos/TEST_ucusu_Eflatun_IHA.mp4"
       round: 1
     video_width: 1920
     video_height: 1080
@@ -18,15 +18,15 @@ object_detector:
       - "--log-level=silent"
     visualization:
       colors:
-        object: [255, 0, 0, 255]
-        target_area: [20, 255, 50, 255]
+        object: [0, 0, 0, 60]
+        target_area: [20, 255, 50, 0]
         aqua: [0, 255, 255, 255]
       thick: 2
       font_size: 32
       margin:
         width_ratio: 0.25
         height_ratio: 0.1
-      topic: "/tracker/tracked_objects"
+      topic: "/webcam/detections"
     model:
       detection_path: "/home/iha/Desktop/eflatun_ws/models/yolov8n_iha_v3.onnx"
       labels_path: "/home/iha/Desktop/eflatun_ws/models/labels.txt"
@@ -34,5 +34,5 @@ object_detector:
       confidence: 0.3 #! implement this
     rtp_ip: "rtp://192.168.1.4:1234"
     bitrate:
-      stream: 15  # MBPS
-      video: 5  # MBPS
+      stream: 1  # MBPS
+      video: 40  # MBPS
