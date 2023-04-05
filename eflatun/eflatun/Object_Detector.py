@@ -159,17 +159,25 @@ class JetsonDetector(Node):
             format=self.full_frame.format)
         jetson.utils.cudaCrop(self.full_frame, self.detection_frame, self.crop_roi)
 
-    def detect_objects(self):
+    def detect_objects(self) -> None:
+        # Get a frame from the webcam.
         self.get_frame()
 
+        # Create a message that will hold the detected objects.
         detections_msg = TrackedObjectArray()
         detections_msg.header.frame_id = "webcam"
         detections_msg.header.stamp = self.get_clock().now().to_msg()
         detections_msg.frame_seq = self.frame_counter
         self.frame_counter += 1
 
-        self.detections = self.plane_detection_model.Detect(self.detection_frame, overlay="none")
+        # Detect objects in the frame.
+        try:
+            self.detections = self.plane_detection_model.Detect(self.detection_frame, overlay="none")
+        except:
+            self.get_logger().error("Detection failed")
+            return
 
+        # Populate the detections message.
         for single_detection in self.detections:
             tracked_detection = TrackedObject()
             tracked_detection.header = detections_msg.header
@@ -181,30 +189,75 @@ class JetsonDetector(Node):
 
             detections_msg.detections.append(tracked_detection)
 
+        # Publish the detections message.
         self.detections_publisher.publish(detections_msg)
+
+    def detect_objects(self):
+        """Detects objects in the current frame.
+
+        This function performs the following steps:
+
+        1. This function gets the current frame from the camera.
+        2. The function then converts the frame into a format that the plane detection model can use.
+        3. This frame is then used to detect planes in the frame.
+        4. The function then creates a TrackedObjectArray message with the plane detections.
+        5. This message is then published to a ROS topic.
+        """
+        self.get_frame()
+
+        detections_msg: TrackedObjectArray = TrackedObjectArray()
+        detections_msg.header.frame_id = "webcam"
+        detections_msg.header.stamp = self.get_clock().now().to_msg()
+        detections_msg.frame_seq = self.frame_counter
+        self.frame_counter += 1
+
+        if self.detection_frame is not None:
+            self.detections = self.plane_detection_model.Detect(self.detection_frame, overlay="none")
+
+            for single_detection in self.detections:
+                tracked_detection: TrackedObject = TrackedObject()
+                tracked_detection.header = detections_msg.header
+                tracked_detection.center_x = single_detection.Center[0] + int(
+                    self.params["model"]["detection_gap_ratio"] * self.params["video_width"])
+                tracked_detection.center_y = single_detection.Center[1]
+                tracked_detection.width = single_detection.Width
+                tracked_detection.height = single_detection.Height
+
+                detections_msg.detections.append(tracked_detection)
+
+            self.detections_publisher.publish(detections_msg)
 
     def stream_frame(self, msg: TrackedObjectArray):
 
         # TODO Since this is a callback, there is delay but frame is current frame. So Bbox comes late. Fix it.
 
-        jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
-                                                int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
-                                        (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
-                                        int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
-                                        tuple(self.params["visualization"]["colors"]["target_area"]), 
-                                        int(self.params["visualization"]["thick"]))
-        jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
-                                                int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
-                                        (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
-                                        int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
-                                        tuple(self.params["visualization"]["colors"]["target_area"]), 
-                                        int(self.params["visualization"]["thick"]))
-        jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
-                                                int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
-                                        (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
-                                        int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
-                                        tuple(self.params["visualization"]["colors"]["target_area"]), 
-                                        int(self.params["visualization"]["thick"]))
+        # Draw a line across the center of the screen.
+        # We do this to make it easier for the user to align the drone with the target.
+        jetson.utils.cudaDrawLine(self.full_frame, 
+            (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+             int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
+            (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+             int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
+            tuple(self.params["visualization"]["colors"]["target_area"]), 
+            int(self.params["visualization"]["thick"]))
+        # Draw a horizontal line at the bottom of the target area
+        jetson.utils.cudaDrawLine(self.full_frame, 
+                                  (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                   int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
+                                  (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                   int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
+                                  tuple(self.params["visualization"]["colors"]["target_area"]), 
+                                  int(self.params["visualization"]["thick"]))
+        # draw line
+        jetson.utils.cudaDrawLine(self.full_frame, 
+                                  (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                   int(self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
+                                  (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
+                                   int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])), 
+                                  tuple(self.params["visualization"]["colors"]["target_area"]), 
+                                  int(self.params["visualization"]["thick"]))
+        # Draw the dashed line to represent the target area
+        # The start and end points of the line are calculated based on the parameters set in the config file
         jetson.utils.cudaDrawLine(self.full_frame, (int(self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
                                                 int(self.params["video_height"] - self.params["visualization"]["margin"]["height_ratio"] * self.params["video_height"])),
                                         (int(self.params["video_width"] - self.params["visualization"]["margin"]["width_ratio"] * self.params["video_width"]), 
@@ -231,11 +284,22 @@ class JetsonDetector(Node):
             jetson.utils.cudaDrawLine(self.full_frame, (int(x2), int(y1)), (int(x2), int(y2)), tuple(self.params["visualization"]["colors"]["object"]), int(self.params["visualization"]["thick"]))
 
 
-        on_image_log = [
-            f"{datetime.now()}",
-            f"{self.params['model']['detection_path'].split('/')[-1]} @{round(self.plane_detection_model.GetNetworkFPS(), 2)} FPS"
-        ]
-
+        if len(self.params['model']['detection_path'].split('/')) > 1:
+            if self.params['model']['detection_path'].split('/')[-1] != "":
+                on_image_log = [
+                    f"{datetime.now()}",
+                    f"{self.params['model']['detection_path'].split('/')[-1]} @{round(self.plane_detection_model.GetNetworkFPS(), 2)} FPS"
+                ]
+            else:
+                on_image_log = [
+                    f"{datetime.now()}",
+                    f"Default Model @{round(self.plane_detection_model.GetNetworkFPS(), 2)} FPS"
+                ]
+        else:
+            on_image_log = [
+                f"{datetime.now()}",
+                f"Default Model @{round(self.plane_detection_model.GetNetworkFPS(), 2)} FPS"
+            ]
 
         self.print_logs_on_image(on_image_log)
 
@@ -245,20 +309,29 @@ class JetsonDetector(Node):
     def print_logs_on_image(self, logs):
 
         for i, log in enumerate(logs):
-            self.font.OverlayText(self.full_frame, self.full_frame.width, self.full_frame.height, log, 10, 32 * i + 10,
-                                  (255, 0, 0), (0, 90, 0, 100))
+            try:
+                self.font.OverlayText(self.full_frame, self.full_frame.width, self.full_frame.height, log, 10, 32 * i + 10,
+                                      (255, 0, 0), (0, 90, 0, 100))
+            except:
+                print("Error printing logs")
 
     def on_parameter_change(self, params):
         # Update the parameter dictionary with the new values
         for param in params:
             try:
+                # Get the key and value
                 param_name = param.name
                 param_value = param.value
 
+                # Split the key into a list of keys
                 param_name = param_name.split(".")
+
+                # Get the dictionary to update from the list of keys
                 params_temp = self.params
                 for key in param_name[:-1]:
                     params_temp = params_temp[key]
+
+                # Update the dictionary
                 params_temp[param_name[-1]] = param_value
                 self.get_logger().info('Parameter {} updated to {}'.format(param_name, param_value))
             except:
