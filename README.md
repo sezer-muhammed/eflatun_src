@@ -294,4 +294,5 @@ In this project, we utilized the following hardware components to achieve object
 
 Make sure you have compatible hardware components when using this project in your own fixed wing airplane setup. Detailed specifications and connection diagrams can be found in the documentation.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/KJvd5yTjxFU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+[![Video Thumbnail](https://img.youtube.com/vi/KJvd5yTjxFU/maxresdefault.jpg)](https://youtu.be/KJvd5yTjxFU)
+
