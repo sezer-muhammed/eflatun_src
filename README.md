@@ -250,6 +250,44 @@ The `vehicle_status` node doesn't publish to any topics.
 | detections | eflatun_msgs/TrackedObject[] | An array of tracked objects                          |
 
 
+## Folder Layout
+
+Be sure that your folder layout is similar with these one:
+
+- eflatun
+  - config
+    - best_object_selector.yaml
+    - object_detector.yaml
+    - object_tracker.yaml
+    - pixhawk.yaml
+    - vehicle_status_gui.yaml
+  - eflatun
+    - Best_Object_Selector.py
+    - Object.py
+    - Object_Detector.py
+    - Object_Tracker.py
+    - QR_Code_Dive.py
+    - Vehicle_Status_Gui.py
+    - __init__.py
+  - launch
+    - pixhawk_test.launch.py
+    - software_in_the_loop.launch.py
+  - package.xml
+  - resource
+    - eflatun
+  - setup.cfg
+  - setup.py
+- eflatun_msgs
+  - CMakeLists.txt
+  - include
+    - eflatun_msgs
+  - msg
+    - TrackedObject.msg
+    - TrackedObjectArray.msg
+  - package.xml
+  - src
+- requirements.txt
+
 ## Code Examples
 
 The Code Examples section should provide examples demonstrating how to use the package in various scenarios. Include code snippets or configuration files to give users a clear understanding of how to implement the package in their projects.
