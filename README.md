@@ -83,39 +83,50 @@ The `object_detector` node does not subscribe to any topics.
 
 ---
 
-### object_tracker
+### 📌 `Object Tracker Node`
 
 The `object_tracker` node is responsible for tracking detected objects in a video stream. It subscribes to the `/webcam/detections` topic, receives detected objects, and updates their tracking information. The tracking information is then published to the `/tracker/tracked_objects` topic.
 
 #### Published Topics
 
-- `/tracker/tracked_objects` (eflatun_msgs/TrackedObjectArray): A list of tracked objects, containing their unique IDs, positions, sizes, and ages.
+| Topic                    | Message Type                 | Description                                                                                       |
+|--------------------------|------------------------------|---------------------------------------------------------------------------------------------------|
+| /tracker/tracked_objects | eflatun_msgs/TrackedObjectArray | A list of tracked objects, containing their unique IDs, positions, sizes, and ages. |
 
 #### Subscribed Topics
 
-- `/webcam/detections` (eflatun_msgs/TrackedObjectArray): A list of detected objects in the video stream, published by the object detection node.
+| Topic             | Message Type                 | Description                                                                                       |
+|-------------------|------------------------------|---------------------------------------------------------------------------------------------------|
+| /webcam/detections | eflatun_msgs/TrackedObjectArray | A list of detected objects in the video stream, published by the object detection node. |
 
+---
 
-### best_object_selector
+### 🎯 `Best Object Selector Node`
 
 The `best_object_selector` is a ROS node responsible for selecting the best object from a list of tracked objects. It subscribes to the `/tracker/tracked_objects` topic, calculates a score for each object based on its properties (width, height, age, and distance to center), and publishes the best object to the `/tracker/best_object` topic. It also takes into account the minimum size of an object and if it lies within the specified range.
 
 #### Published Topics
 
-- `/tracker/best_object` (eflatun_msgs/TrackedObject): The best object selected based on the calculated score.
+| Topic              | Message Type         | Description                                                                                       |
+|--------------------|----------------------|---------------------------------------------------------------------------------------------------|
+| /tracker/best_object | eflatun_msgs/TrackedObject | The best object selected based on the calculated score. |
 
 #### Subscribed Topics
 
-- `/tracker/tracked_objects` (eflatun_msgs/TrackedObjectArray): A list of tracked objects published by the object tracker.
+| Topic                   | Message Type                 | Description                                                                                       |
+|-------------------------|------------------------------|---------------------------------------------------------------------------------------------------|
+| /tracker/tracked_objects | eflatun_msgs/TrackedObjectArray | A list of tracked objects published by the object tracker. |
+
+---
 
 
-### vehicle_status
+### 🚗 `Vehicle Status Node`
 
 This is a Python script for a simple GUI that subscribes to multiple MAVROS topics using ROS2 and displays the received data in a table.
 
 The `MavrosSubscriber` class is a ROS2 node that subscribes to the provided topics using the `create_subscription` method from the `Node` class. When a message is received on a subscribed topic, the corresponding callback function is called to update the GUI.
 
-The `MavrosGUI` class is a PyQt5 widget that displays a table with the subscribed topics and their values. The `update_table` method updates the table with the received message.                     
+The `MavrosGUI` class is a PyQt5 widget that displays a table with the subscribed topics and their values. The `update_table` method updates the table with the received message.
 
 #### Published Topics
 
@@ -123,19 +134,22 @@ The `vehicle_status` node doesn't publish to any topics.
 
 #### Subscribed Topics
 
-- `/diagnostics` (DiagnosticArray): provides diagnostic information about the system.
-- `/mavros/battery` (BatteryState): provides information about the battery level.
-- `/mavros/mavros/data` (Imu): provides data from the IMU (Inertial Measurement Unit).
-- `/mavros/mavros/data_raw` (Imu): provides raw data from the IMU.
-- `/mavros/mavros/diff_pressure` (FluidPressure): provides differential pressure data.
-- `/mavros/mavros/in` (RCIn): provides information about the input channels.
-- `/mavros/mavros/mag` (MagneticField): provides magnetometer data.
-- `/mavros/mavros/out` (RCOut): provides information about the output channels.
-- `/mavros/mavros/output` (NavControllerOutput): provides information about the navigation controller output.
-- `/mavros/mavros/raw/fix` (NavSatFix): provides raw GPS data.
-- `/mavros/mavros/raw/gps_vel` (TwistStamped): provides raw GPS velocity data.
-- `/mavros/mavros/raw/satellites` (UInt32): provides information about GPS satellites.
+| Topic                     | Message Type         | Description                                                                                 |
+|---------------------------|----------------------|---------------------------------------------------------------------------------------------|
+| /diagnostics              | DiagnosticArray      | Provides diagnostic information about the system.                                          |
+| /mavros/battery           | BatteryState         | Provides information about the battery level.                                              |
+| /mavros/mavros/data       | Imu                  | Provides data from the IMU (Inertial Measurement Unit).                                    |
+| /mavros/mavros/data_raw   | Imu                  | Provides raw data from the IMU.                                                             |
+| /mavros/mavros/diff_pressure | FluidPressure     | Provides differential pressure data.                                                        |
+| /mavros/mavros/in         | RCIn                 | Provides information about the input channels.                                              |
+| /mavros/mavros/mag        | MagneticField        | Provides magnetometer data.                                                                 |
+| /mavros/mavros/out        | RCOut                | Provides information about the output channels.                                             |
+| /mavros/mavros/output     | NavControllerOutput  | Provides information about the navigation controller output.                                |
+| /mavros/mavros/raw/fix    | NavSatFix            | Provides raw GPS data.                                                                      |
+| /mavros/mavros/raw/gps_vel | TwistStamped       | Provides raw GPS velocity data.                                                             |
+| /mavros/mavros/raw/satellites | UInt32          | Provides information about GPS satellites.                                                  |
 
+---
 
 ## Parameters
 
