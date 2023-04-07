@@ -281,16 +281,12 @@ In this project, we utilized the following hardware components to achieve object
 
 - **Airframe**: Our custom-built airframe has a wingspan of X meters and a length of Y meters. The airframe is made of lightweight, durable materials such as carbon fiber and foam, ensuring optimal flight performance and endurance. The hardware produced at NURUS Company.
 
-- **Flight Controller**: We used the Flight Controller Model ABC, which features advanced flight control algorithms, GPS waypoint navigation, and compatibility with a wide range of sensors and peripherals.
+- **Flight Controller**: TODO
 
-- **Camera**: Our chosen camera is the Camera Model XYZ with a resolution of 4K at 30 FPS. This high-quality camera ensures clear images and videos, facilitating accurate object detection and tracking. The camera is equipped with a wide dynamic range and low-latency video transmission for real-time analysis.
+- **Camera**: TODO
 
-- **Onboard Computer**: We integrated the Onboard Computer Model 123 with our system, featuring a powerful processor and ample RAM for running machine learning models and processing data in real-time. The onboard computer is responsible for handling object detection and tracking tasks while communicating with the flight controller for efficient decision-making.
+- **Onboard Computer**: TODO
 
-- **Sensors**: In addition to the camera, we have incorporated the following sensors to enhance the system's capabilities:
-  - GPS: For precise location tracking and waypoint navigation.
-  - IMU (Inertial Measurement Unit): For measuring linear and angular motion, enabling accurate attitude estimation and stabilization.
-  - LIDAR: For real-time distance measurements, allowing the airplane to maintain a safe distance from obstacles and terrain.
 
 Make sure you have compatible hardware components when using this project in your own fixed wing airplane setup. Detailed specifications and connection diagrams can be found in the documentation.
 
