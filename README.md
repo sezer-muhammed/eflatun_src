@@ -294,8 +294,4 @@ In this project, we utilized the following hardware components to achieve object
 
 Make sure you have compatible hardware components when using this project in your own fixed wing airplane setup. Detailed specifications and connection diagrams can be found in the documentation.
 
-## Resources
-Here are some resources listed for deep learning:
-- **[Jetson eLinux](https://www.elinux.org/Jetson)**
-- **[NVIDIA AI IOT](https://github.com/NVIDIA-AI-IOT)**
-- **[ROS nodes](https://github.com/dusty-nv/ros_deep_learning)**
+<iframe width="560" height="315" src="https://www.youtube.com/embed/KJvd5yTjxFU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
