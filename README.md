@@ -65,17 +65,23 @@ The Usage section should include detailed examples demonstrating how to use the 
 
 ## Node Descriptions
 
-### object_detector
+---
+
+### 🔎 `Object Detector Node`
 
 The `object_detector` node is responsible for detecting objects in a video stream. It processes the video frames and identifies objects based on the provided model. The node does not subscribe to any topics.
 
 #### Published Topics
 
-- `/webcam/detections` (eflatun_msgs/TrackedObjectArray): A list of detected objects in the video stream, including their positions, sizes, and class IDs. This topic is published by the object detection node and consumed by the `object_tracker` node for further processing and tracking.
+| Topic                | Message Type                 | Description                                                                                   |
+|----------------------|------------------------------|-----------------------------------------------------------------------------------------------|
+| /webcam/detections   | eflatun_msgs/TrackedObjectArray | A list of detected objects in the video stream, including their positions, sizes, and class IDs. This topic is published by the object detection node and consumed by the `object_tracker` node for further processing and tracking. |
 
 #### Subscribed Topics
 
 The `object_detector` node does not subscribe to any topics.
+
+---
 
 ### object_tracker
 
