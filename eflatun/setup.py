@@ -26,6 +26,7 @@ setup(
             'object = eflatun.Object:main',
             'best_object_selector = eflatun.Best_Object_Selector:main',
             'vehicle_status_gui = eflatun.Vehicle_Status_Gui:main',
+            'plane_commander = eflatun.Plane_Commander:main',
         ],
     },
 )
