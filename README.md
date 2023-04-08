@@ -65,51 +65,68 @@ The Usage section should include detailed examples demonstrating how to use the 
 
 ## Node Descriptions
 
-### object_detector
+---
+
+### 🔎 `Object Detector Node`
 
 The `object_detector` node is responsible for detecting objects in a video stream. It processes the video frames and identifies objects based on the provided model. The node does not subscribe to any topics.
 
 #### Published Topics
 
-- `/webcam/detections` (eflatun_msgs/TrackedObjectArray): A list of detected objects in the video stream, including their positions, sizes, and class IDs. This topic is published by the object detection node and consumed by the `object_tracker` node for further processing and tracking.
+| Topic                | Message Type                 | Description                                                                                   |
+|----------------------|------------------------------|-----------------------------------------------------------------------------------------------|
+| /webcam/detections   | eflatun_msgs/TrackedObjectArray | A list of detected objects in the video stream, including their positions, sizes, and class IDs. This topic is published by the object detection node and consumed by the `object_tracker` node for further processing and tracking. |
 
 #### Subscribed Topics
 
 The `object_detector` node does not subscribe to any topics.
 
-### object_tracker
+---
+
+### 📌 `Object Tracker Node`
 
 The `object_tracker` node is responsible for tracking detected objects in a video stream. It subscribes to the `/webcam/detections` topic, receives detected objects, and updates their tracking information. The tracking information is then published to the `/tracker/tracked_objects` topic.
 
 #### Published Topics
 
-- `/tracker/tracked_objects` (eflatun_msgs/TrackedObjectArray): A list of tracked objects, containing their unique IDs, positions, sizes, and ages.
+| Topic                    | Message Type                 | Description                                                                                       |
+|--------------------------|------------------------------|---------------------------------------------------------------------------------------------------|
+| /tracker/tracked_objects | eflatun_msgs/TrackedObjectArray | A list of tracked objects, containing their unique IDs, positions, sizes, and ages. |
 
 #### Subscribed Topics
 
-- `/webcam/detections` (eflatun_msgs/TrackedObjectArray): A list of detected objects in the video stream, published by the object detection node.
+| Topic             | Message Type                 | Description                                                                                       |
+|-------------------|------------------------------|---------------------------------------------------------------------------------------------------|
+| /webcam/detections | eflatun_msgs/TrackedObjectArray | A list of detected objects in the video stream, published by the object detection node. |
 
+---
 
-### best_object_selector
+### 🎯 `Best Object Selector Node`
 
 The `best_object_selector` is a ROS node responsible for selecting the best object from a list of tracked objects. It subscribes to the `/tracker/tracked_objects` topic, calculates a score for each object based on its properties (width, height, age, and distance to center), and publishes the best object to the `/tracker/best_object` topic. It also takes into account the minimum size of an object and if it lies within the specified range.
 
 #### Published Topics
 
-- `/tracker/best_object` (eflatun_msgs/TrackedObject): The best object selected based on the calculated score.
+| Topic              | Message Type         | Description                                                                                       |
+|--------------------|----------------------|---------------------------------------------------------------------------------------------------|
+| /tracker/best_object | eflatun_msgs/TrackedObject | The best object selected based on the calculated score. |
 
 #### Subscribed Topics
 
-- `/tracker/tracked_objects` (eflatun_msgs/TrackedObjectArray): A list of tracked objects published by the object tracker.
+| Topic                   | Message Type                 | Description                                                                                       |
+|-------------------------|------------------------------|---------------------------------------------------------------------------------------------------|
+| /tracker/tracked_objects | eflatun_msgs/TrackedObjectArray | A list of tracked objects published by the object tracker. |
+
+---
 
 
-### vehicle_status
+### 🚗 `Vehicle Status Node`
 
 This is a Python script for a simple GUI that subscribes to multiple MAVROS topics using ROS2 and displays the received data in a table.
 
 The `MavrosSubscriber` class is a ROS2 node that subscribes to the provided topics using the `create_subscription` method from the `Node` class. When a message is received on a subscribed topic, the corresponding callback function is called to update the GUI.
 
-The `MavrosGUI` class is a PyQt5 widget that displays a table with the subscribed topics and their values. The `update_table` method updates the table with the received message.                     
+The `MavrosGUI` class is a PyQt5 widget that displays a table with the subscribed topics and their values. The `update_table` method updates the table with the received message.
 
 #### Published Topics
 
@@ -117,19 +134,22 @@ The `vehicle_status` node doesn't publish to any topics.
 
 #### Subscribed Topics
 
-- `/diagnostics` (DiagnosticArray): provides diagnostic information about the system.
-- `/mavros/battery` (BatteryState): provides information about the battery level.
-- `/mavros/mavros/data` (Imu): provides data from the IMU (Inertial Measurement Unit).
-- `/mavros/mavros/data_raw` (Imu): provides raw data from the IMU.
-- `/mavros/mavros/diff_pressure` (FluidPressure): provides differential pressure data.
-- `/mavros/mavros/in` (RCIn): provides information about the input channels.
-- `/mavros/mavros/mag` (MagneticField): provides magnetometer data.
-- `/mavros/mavros/out` (RCOut): provides information about the output channels.
-- `/mavros/mavros/output` (NavControllerOutput): provides information about the navigation controller output.
-- `/mavros/mavros/raw/fix` (NavSatFix): provides raw GPS data.
-- `/mavros/mavros/raw/gps_vel` (TwistStamped): provides raw GPS velocity data.
-- `/mavros/mavros/raw/satellites` (UInt32): provides information about GPS satellites.
+| Topic                     | Message Type         | Description                                                                                 |
+|---------------------------|----------------------|---------------------------------------------------------------------------------------------|
+| /diagnostics              | DiagnosticArray      | Provides diagnostic information about the system.                                          |
+| /mavros/battery           | BatteryState         | Provides information about the battery level.                                              |
+| /mavros/mavros/data       | Imu                  | Provides data from the IMU (Inertial Measurement Unit).                                    |
+| /mavros/mavros/data_raw   | Imu                  | Provides raw data from the IMU.                                                             |
+| /mavros/mavros/diff_pressure | FluidPressure     | Provides differential pressure data.                                                        |
+| /mavros/mavros/in         | RCIn                 | Provides information about the input channels.                                              |
+| /mavros/mavros/mag        | MagneticField        | Provides magnetometer data.                                                                 |
+| /mavros/mavros/out        | RCOut                | Provides information about the output channels.                                             |
+| /mavros/mavros/output     | NavControllerOutput  | Provides information about the navigation controller output.                                |
+| /mavros/mavros/raw/fix    | NavSatFix            | Provides raw GPS data.                                                                      |
+| /mavros/mavros/raw/gps_vel | TwistStamped       | Provides raw GPS velocity data.                                                             |
+| /mavros/mavros/raw/satellites | UInt32          | Provides information about GPS satellites.                                                  |
 
+---
 
 ## Parameters
 
@@ -261,21 +281,14 @@ In this project, we utilized the following hardware components to achieve object
 
 - **Airframe**: Our custom-built airframe has a wingspan of X meters and a length of Y meters. The airframe is made of lightweight, durable materials such as carbon fiber and foam, ensuring optimal flight performance and endurance. The hardware produced at NURUS Company.
 
-- **Flight Controller**: We used the Flight Controller Model ABC, which features advanced flight control algorithms, GPS waypoint navigation, and compatibility with a wide range of sensors and peripherals.
+- **Flight Controller**: TODO
 
-- **Camera**: Our chosen camera is the Camera Model XYZ with a resolution of 4K at 30 FPS. This high-quality camera ensures clear images and videos, facilitating accurate object detection and tracking. The camera is equipped with a wide dynamic range and low-latency video transmission for real-time analysis.
+- **Camera**: TODO
 
-- **Onboard Computer**: We integrated the Onboard Computer Model 123 with our system, featuring a powerful processor and ample RAM for running machine learning models and processing data in real-time. The onboard computer is responsible for handling object detection and tracking tasks while communicating with the flight controller for efficient decision-making.
+- **Onboard Computer**: TODO
 
-- **Sensors**: In addition to the camera, we have incorporated the following sensors to enhance the system's capabilities:
-  - GPS: For precise location tracking and waypoint navigation.
-  - IMU (Inertial Measurement Unit): For measuring linear and angular motion, enabling accurate attitude estimation and stabilization.
-  - LIDAR: For real-time distance measurements, allowing the airplane to maintain a safe distance from obstacles and terrain.
 
 Make sure you have compatible hardware components when using this project in your own fixed wing airplane setup. Detailed specifications and connection diagrams can be found in the documentation.
 
-## Resources
-Here are some resources listed for deep learning:
-- **[Jetson eLinux](https://www.elinux.org/Jetson)**
-- **[NVIDIA AI IOT](https://github.com/NVIDIA-AI-IOT)**
-- **[ROS nodes](https://github.com/dusty-nv/ros_deep_learning)**
+[![Video Thumbnail](https://img.youtube.com/vi/KJvd5yTjxFU/maxresdefault.jpg)](https://youtu.be/KJvd5yTjxFU) 
+
