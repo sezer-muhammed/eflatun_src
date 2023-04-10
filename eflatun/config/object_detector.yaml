@@ -1,6 +1,6 @@
 object_detector:
   ros__parameters:
-    log_level: "error"
+    log_level: "info"
     use_device: "cam"  # Choose between "video" and "cam"
     video:
       device: "file:///home/iha/Desktop/eflatun_ws/videos/sample_detection_video_v1.mp4"
@@ -32,7 +32,7 @@ object_detector:
       labels_path: "/home/iha/Desktop/eflatun_ws/models/labels.txt"
       detection_gap_ratio: 0.1
       confidence: 0.3 #! implement this
-    rtp_ip: "rtp://192.168.1.4:1234"
+    rtp_ip: "rtp://192.168.1.2:1234"
     bitrate:
-      stream: 1  # MBPS
-      video: 40  # MBPS
+      stream: 15  # MBPS
+      video: 15  # MBPS
