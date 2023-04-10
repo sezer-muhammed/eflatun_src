@@ -1,8 +1,10 @@
 # pixhawk.yaml
-mavros:
+mavros_node:
   ros__parameters:
     fcu_url: "serial:///dev/ttyACM0:115200"
+    #fcu_protocol: "v1.0"
+    start_px4: False
     system_id: 1
     component_id: 1
-    target_system: 1
-    target_component: 1
+    target_system_id: 1
+    target_component_id: 1

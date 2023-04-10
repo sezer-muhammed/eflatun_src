@@ -8,8 +8,9 @@ def generate_launch_description():
         Node(
             package='mavros',
             executable='mavros_node',
-            name='mavros',
             output='screen',
-            parameters=[os.path.join(get_package_share_directory('eflatun'),'config','vehicle_status_gui.yaml')]
+            parameters=[
+                {"fcu_url": "/dev/ttyACM0:115200"},
+            ]
         )
     ])
