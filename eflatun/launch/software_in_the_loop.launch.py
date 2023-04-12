@@ -30,7 +30,7 @@ def generate_launch_description():
             parameters=[os.path.join(get_package_share_directory('eflatun'),'config','controller.yaml')]
         ),
         ExecuteProcess(
-            cmd=['ros2', 'bag', 'play', '/home/iha/Desktop/eflatun_ws/bag_files/rosbag2_2023_03_22-19_33_53'],
+            cmd=['ros2', 'bag', 'play', '/home/sezer/Desktop/uav_ws/eflatun_src/bag_files/rosbag2_2023_03_22-19_33_53'],
             output='screen'
         ),
     ])

@@ -10,6 +10,7 @@ from rclpy.logging import LoggingSeverity
 from rcl_interfaces.msg import SetParametersResult
 
 import json
+from simple_pid import PID
 
 class ControlPixhawk(Node):
     def __init__(self):
@@ -70,6 +71,31 @@ class ControlPixhawk(Node):
             }
         }
 
+
+        self.PID_Aileron = PID(self.params['PID_Aileron']['P'],
+                                self.params['PID_Aileron']['I'],
+                                self.params['PID_Aileron']['D'],
+                                setpoint=self.params["frame_center"]["x"], sample_time=0.1, output_limits=(1000, 2000))
+        self.PID_Aileron._integral = self.params["PID_Aileron"]["FF"]
+    
+        self.PID_Elevator = PID(self.params['PID_Elevator']['P'],
+                                 self.params['PID_Elevator']['I'],
+                                 self.params['PID_Elevator']['D'],
+                                 setpoint=self.params["frame_center"]["y"], sample_time=0.1, output_limits=(1000, 2000))
+        self.PID_Elevator._integral = self.params["PID_Elevator"]["FF"]
+
+        self.PID_Rudder = PID(self.params['PID_Rudder']['P'],
+                               self.params['PID_Rudder']['I'],
+                               self.params['PID_Rudder']['D'],
+                               setpoint=self.params["frame_center"]["x"], sample_time=0.1, output_limits=(1000, 2000))
+        self.PID_Rudder._integral = self.params["PID_Rudder"]["FF"]
+
+        self.PID_Thrust = PID(self.params['PID_Thrust']['P'],
+                               self.params['PID_Thrust']['I'],
+                               self.params['PID_Thrust']['D'],
+                               setpoint=0, sample_time=0.1, output_limits=(1000, 1600))
+        self.PID_Thrust._integral = self.params["PID_Thrust"]["FF"]
+
         log_level_mapping = {
             'debug': LoggingSeverity.DEBUG,
             'info': LoggingSeverity.INFO,
@@ -77,6 +103,9 @@ class ControlPixhawk(Node):
             'error': LoggingSeverity.ERROR,
             'fatal': LoggingSeverity.FATAL,
         }
+
+        self.add_on_set_parameters_callback(self.on_parameter_change)
+    
         log_level = log_level_mapping.get(self.params["log_level"], LoggingSeverity.INFO)
         self.get_logger().set_level(log_level)
 
@@ -84,6 +113,7 @@ class ControlPixhawk(Node):
 
         self.publisher = self.create_publisher(OverrideRCIn, '/mavros/rc/override', 2)
         self.best_object_callback = self.create_subscription(TrackedObject, "tracker/best_object", self.best_object_callback, qos_profile_sensor_data)
+        self.object_follow_counter = 6
 
         self.area = 0
         self.width = 0
@@ -93,9 +123,12 @@ class ControlPixhawk(Node):
         self.id = 0
 
         timer_period = 0.1
+
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
     def best_object_callback(self, msg: TrackedObject):
+        self.object_follow_counter = 10
+
         self.area = msg.width * msg.height
         self.width = msg.width
         self.heights = msg.height
@@ -105,13 +138,19 @@ class ControlPixhawk(Node):
 
     def timer_callback(self):
         msg = OverrideRCIn()
+        self.object_follow_counter -= 1
 
-        error_x = self.x - self.params["frame_center"]["x"]
-        error_y = self.y - self.params["frame_center"]["y"]
+        if self.object_follow_counter == 0:
+            self.publisher.publish(msg)
+            self.get_logger().debug(f"No Object")
+            return
+        
 
-        msg.channels[0] = int(error_x) + 1000
-        msg.channels[1] = int(error_y) + 1000
-
+        msg.channels[0] = int(self.PID_Aileron(self.x))
+        msg.channels[1] = int(self.PID_Elevator(self.y + abs((msg.channels[0] - 1500)))) #! Test it ifts pitch up the plane while aileron is acitve
+        msg.channels[3] = int(self.PID_Rudder(self.x))
+        msg.channels[2] = int(self.PID_Thrust(self.width - 150)) + 400
+        self.get_logger().debug(f"{msg.channels[:4]}")
         self.publisher.publish(msg)
 
 
@@ -132,7 +171,12 @@ class ControlPixhawk(Node):
                 self.get_logger().warning('Parameter {} cannot updated to {}'.format(param_name, param_value))
                 return SetParametersResult(successful=False)
             
-        return SetParametersResult(successful=True)
+        self.PID_Aileron.tunings = self.params['PID_Aileron']['P'], self.params['PID_Aileron']['I'], self.params['PID_Aileron']['D']
+        self.PID_Rudder.tunings = self.params['PID_Rudder']['P'], self.params['PID_Rudder']['I'], self.params['PID_Rudder']['D']
+        self.PID_Thrust.tunings = self.params['PID_Thrust']['P'], self.params['PID_Thrust']['I'], self.params['PID_Thrust']['D']
+        self.PID_Elevator.tunings = self.params['PID_Elevator']['P'], self.params['PID_Elevator']['I'], self.params['PID_Elevator']['D']
+
+        return SetParametersResult(successful=True)            
 
 def main(args=None):
     rclpy.init(args=args)

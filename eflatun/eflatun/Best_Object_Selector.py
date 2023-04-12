@@ -65,6 +65,10 @@ class BestObjectSelector(Node):
             'error': LoggingSeverity.ERROR,
             'fatal': LoggingSeverity.FATAL,
         }
+
+
+        self.add_on_set_parameters_callback(self.on_parameter_change)
+
         log_level = log_level_mapping.get(self.params["log_level"], LoggingSeverity.INFO)
         self.get_logger().set_level(log_level)
 
