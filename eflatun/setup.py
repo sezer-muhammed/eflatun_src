@@ -10,7 +10,7 @@ setup(
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', ['launch/software_in_the_loop.launch.py', 'launch/pixhawk_test.launch.py', 'launch/video_save.launch.py']),
-        ('share/' + package_name + '/config', ['config/object_tracker.yaml', 'config/object_detector.yaml', 'config/best_object_selector.yaml']), 
+        ('share/' + package_name + '/config', ['config/object_tracker.yaml', 'config/object_detector.yaml', 'config/best_object_selector.yaml', 'config/controller.yaml']), 
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -25,8 +25,7 @@ setup(
             'object_detector = eflatun.Object_Detector:main',
             'object = eflatun.Object:main',
             'best_object_selector = eflatun.Best_Object_Selector:main',
-            'vehicle_status_gui = eflatun.Vehicle_Status_Gui:main',
-            'plane_commander = eflatun.Plane_Commander:main',
+            'controller = eflatun.Controller:main',
         ],
     },
 )
