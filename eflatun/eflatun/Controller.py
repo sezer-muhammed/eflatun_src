@@ -149,7 +149,7 @@ class ControlPixhawk(Node):
         msg.channels[0] = int(self.PID_Aileron(self.x))
         msg.channels[1] = int(self.PID_Elevator(self.y + abs((msg.channels[0] - 1500)))) #! Test it ifts pitch up the plane while aileron is acitve
         msg.channels[3] = int(self.PID_Rudder(self.x))
-        msg.channels[2] = int(self.PID_Thrust(self.width - 150)) + 400
+        msg.channels[2] = 0 #int(self.PID_Thrust(self.width - 150)) + 400
         self.get_logger().debug(f"{msg.channels[:4]}")
         self.publisher.publish(msg)
 

@@ -13,7 +13,7 @@ def generate_launch_description():
             executable='mavros_node',
             output='screen',
             parameters=[
-                {"fcu_url": "/dev/ttyACM1:115200"},
+                {"fcu_url": "/dev/ttyACM0:115200"},
             ]
         )
     ])

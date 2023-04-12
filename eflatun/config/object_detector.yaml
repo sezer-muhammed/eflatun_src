@@ -34,5 +34,5 @@ object_detector:
       confidence: 0.3 #! implement this
     rtp_ip: "rtp://192.168.1.2:1234"
     bitrate:
-      stream: 15  # MBPS
-      video: 15  # MBPS
+      stream: 10  # MBPS
+      video: 30  # MBPS
