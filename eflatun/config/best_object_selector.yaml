@@ -1,6 +1,6 @@
 best_object_selector:
   ros__parameters:
-    log_level: "info"
+    log_level: "error"
     frame_center:
       x: 960
       y: 580 # A bit lower in order to see the plane better
