@@ -1,7 +1,7 @@
 object_detector:
   ros__parameters:
     log_level: "error"
-    use_device: "cam"  # Choose between "video" and "cam"
+    use_device: "video"  # Choose between "video" and "cam"
     video:
       device: "file:///home/iha/Desktop/eflatun_ws/videos/sample_detection_video_v1.mp4"
       save_path: "/home/iha/Desktop/eflatun_ws/videos/output_videos/test_video_Eflatun_IHA_TODO.mp4"
