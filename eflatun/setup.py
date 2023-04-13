@@ -9,7 +9,7 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name + '/launch', ['launch/software_in_the_loop.launch.py', 'launch/pixhawk_test.launch.py', 'launch/video_save.launch.py']),
+        ('share/' + package_name + '/launch', ['launch/software_in_the_loop.launch.py', 'launch/pixhawk_test.launch.py', 'launch/video_save.launch.py', 'launch/fake_detector.launch.py']),
         ('share/' + package_name + '/config', ['config/object_tracker.yaml', 'config/object_detector.yaml', 'config/best_object_selector.yaml', 'config/controller.yaml']), 
     ],
     install_requires=['setuptools'],
@@ -23,6 +23,7 @@ setup(
         'console_scripts': [
             'object_tracker = eflatun.Object_Tracker:main',
             'object_detector = eflatun.Object_Detector:main',
+            'fake_object_detector = eflatun.object_detector_fake:main',
             'object = eflatun.Object:main',
             'best_object_selector = eflatun.Best_Object_Selector:main',
             'controller = eflatun.Controller:main',
