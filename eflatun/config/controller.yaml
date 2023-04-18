@@ -6,17 +6,17 @@ controller:
       y: 580 # A bit lower in order to see the plane better and have more altitude
 
     PID_Aileron:
-      P: 1.0
-      I: 0.009
-      D: 0.05
+      P: -0.1
+      I: -0.009
+      D: -0.05
       FF: 1500.0
     PID_Elevator:
-      P: 0.5
-      I: 0.009
-      D: 0.05
+      P: -0.1
+      I: -0.009
+      D: -0.05
       FF: 1500.0
     PID_Rudder:
-      P: 0.52
+      P: 0.06
       I: 0.003
       D: 0.01
       FF: 1500.0

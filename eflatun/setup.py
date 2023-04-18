@@ -27,6 +27,7 @@ setup(
             'object = eflatun.Object:main',
             'best_object_selector = eflatun.Best_Object_Selector:main',
             'controller = eflatun.Controller:main',
+            'comm = eflatun.comm:main',
         ],
     },
 )

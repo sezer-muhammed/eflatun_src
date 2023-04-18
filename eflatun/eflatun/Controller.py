@@ -138,16 +138,20 @@ class ControlPixhawk(Node):
 
     def timer_callback(self):
         msg = OverrideRCIn()
-        self.object_follow_counter -= 1
+        self.object_follow_counter = max(self.object_follow_counter - 1, 0)
 
         if self.object_follow_counter == 0:
             self.publisher.publish(msg)
-            self.get_logger().debug(f"No Object")
+            self.get_logger().info(f"No Object resetting PID")
+            self.PID_Aileron._integral = self.params["PID_Aileron"]["FF"]
+            self.PID_Elevator._integral = self.params["PID_Elevator"]["FF"]
+            self.PID_Rudder._integral = self.params["PID_Rudder"]["FF"]
+            self.PID_Thrust._integral = self.params["PID_Thrust"]["FF"]
             return
         
 
         msg.channels[0] = int(self.PID_Aileron(self.x))
-        msg.channels[1] = int(self.PID_Elevator(self.y + abs((msg.channels[0] - 1500)))) #! Test it ifts pitch up the plane while aileron is acitve
+        msg.channels[1] = int(self.PID_Elevator(self.y + abs((msg.channels[0] - 1500)) / 10)) #! Test it ifts pitch up the plane while aileron is acitve
         msg.channels[3] = int(self.PID_Rudder(self.x))
         msg.channels[2] = 0 #int(self.PID_Thrust(self.width - 150)) + 400
         self.get_logger().debug(f"{msg.channels[:4]}")
